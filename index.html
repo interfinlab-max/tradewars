@@ -1,0 +1,3033 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="auto">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Торговые войны — v3.2 (Заход 1/3)</title>
+<!-- Fonts & icons -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"/>
+<!-- Charts / export libs -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.5.0/chart.umd.min.js">
+// --- Ensure single-tap activation for Next button on touch devices ---
+(function ensureNextSingleTap(){
+  const btn = document.getElementById('btnNext');
+  if (!btn) return;
+  // prevent double-tap zoom issues on iOS
+  btn.addEventListener('touchend', function(e){ e.preventDefault(); btn.click(); }, {passive:false});
+})();
+
+
+/*
+  === Пасхалка r6tr0 / amir ===
+  Активация (в коде, чтобы игрок сам не догадался):
+  — Desktop: удерживай Shift и нажми "E", затем набери по буквам r6tr0 (нечувствительно к регистру).
+  — Mobile: сделай 3 быстрых тапа по левому логотипу, затем долгий тап 800мс.
+  Подсказки для теста разработчика оставлены в комментариях.
+*/
+(function eggInit(){
+  const mask = document.getElementById('eggMask');
+  const close = document.getElementById('eggClose');
+  const logo = document.querySelector('.brand'); // левый логотип/заголовок
+  function openEgg(){ mask.style.display='grid'; }
+  function closeEgg(){ mask.style.display='none'; }
+  close.addEventListener('click', closeEgg);
+
+  // Desktop combo: Shift+E then type r6tr0
+  let armed = false, buffer = '';
+  window.addEventListener('keydown', (e)=>{
+    if (e.key.toLowerCase()==='e' && e.shiftKey){ armed = true; buffer=''; }
+    else if (armed){
+      buffer += e.key.toLowerCase();
+      if (!'r6tr0'.startsWith(buffer)) { armed=false; buffer=''; }
+      else if (buffer==='r6tr0'){ openEgg(); armed=false; buffer=''; }
+    }
+  });
+
+  // Mobile: triple-tap then long-press
+  let taps = 0, lastTap = 0, pressTimer=null;
+  function onTap(){
+    const now = Date.now();
+    if (now - lastTap < 400) taps++; else taps=1;
+    lastTap = now;
+    if (taps>=3){
+      // ждём долгого удержания
+      if (pressTimer) clearTimeout(pressTimer);
+      logo.addEventListener('touchstart', ()=>{
+        pressTimer = setTimeout(openEgg, 800);
+      }, {once:true});
+      logo.addEventListener('touchend', ()=>{ if (pressTimer) clearTimeout(pressTimer); }, {once:true});
+    }
+  }
+  if (logo){
+    logo.addEventListener('click', onTap);
+    logo.addEventListener('touchend', (e)=>{ e.preventDefault(); onTap(); }, {passive:false});
+  }
+})();
+
+
+// Adjust chart heights for device
+(function adjustChartHeights(){
+  const isMobile = window.matchMedia('(max-width: 768px)').matches;
+  document.documentElement.setAttribute('data-device', isMobile ? 'mobile' : 'desktop');
+  const h = isMobile ? '240px' : '360px';
+  document.documentElement.style.setProperty('--chart-h', h);
+})();
+
+</script>
+<script src="https://cdn.jsdelivr.net/npm/file-saver@2.0.5/dist/FileSaver.min.js">
+// --- Ensure single-tap activation for Next button on touch devices ---
+(function ensureNextSingleTap(){
+  const btn = document.getElementById('btnNext');
+  if (!btn) return;
+  // prevent double-tap zoom issues on iOS
+  btn.addEventListener('touchend', function(e){ e.preventDefault(); btn.click(); }, {passive:false});
+})();
+
+
+/*
+  === Пасхалка r6tr0 / amir ===
+  Активация (в коде, чтобы игрок сам не догадался):
+  — Desktop: удерживай Shift и нажми "E", затем набери по буквам r6tr0 (нечувствительно к регистру).
+  — Mobile: сделай 3 быстрых тапа по левому логотипу, затем долгий тап 800мс.
+  Подсказки для теста разработчика оставлены в комментариях.
+*/
+(function eggInit(){
+  const mask = document.getElementById('eggMask');
+  const close = document.getElementById('eggClose');
+  const logo = document.querySelector('.brand'); // левый логотип/заголовок
+  function openEgg(){ mask.style.display='grid'; }
+  function closeEgg(){ mask.style.display='none'; }
+  close.addEventListener('click', closeEgg);
+
+  // Desktop combo: Shift+E then type r6tr0
+  let armed = false, buffer = '';
+  window.addEventListener('keydown', (e)=>{
+    if (e.key.toLowerCase()==='e' && e.shiftKey){ armed = true; buffer=''; }
+    else if (armed){
+      buffer += e.key.toLowerCase();
+      if (!'r6tr0'.startsWith(buffer)) { armed=false; buffer=''; }
+      else if (buffer==='r6tr0'){ openEgg(); armed=false; buffer=''; }
+    }
+  });
+
+  // Mobile: triple-tap then long-press
+  let taps = 0, lastTap = 0, pressTimer=null;
+  function onTap(){
+    const now = Date.now();
+    if (now - lastTap < 400) taps++; else taps=1;
+    lastTap = now;
+    if (taps>=3){
+      // ждём долгого удержания
+      if (pressTimer) clearTimeout(pressTimer);
+      logo.addEventListener('touchstart', ()=>{
+        pressTimer = setTimeout(openEgg, 800);
+      }, {once:true});
+      logo.addEventListener('touchend', ()=>{ if (pressTimer) clearTimeout(pressTimer); }, {once:true});
+    }
+  }
+  if (logo){
+    logo.addEventListener('click', onTap);
+    logo.addEventListener('touchend', (e)=>{ e.preventDefault(); onTap(); }, {passive:false});
+  }
+})();
+
+
+// Adjust chart heights for device
+(function adjustChartHeights(){
+  const isMobile = window.matchMedia('(max-width: 768px)').matches;
+  document.documentElement.setAttribute('data-device', isMobile ? 'mobile' : 'desktop');
+  const h = isMobile ? '240px' : '360px';
+  document.documentElement.style.setProperty('--chart-h', h);
+})();
+
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js">
+// --- Ensure single-tap activation for Next button on touch devices ---
+(function ensureNextSingleTap(){
+  const btn = document.getElementById('btnNext');
+  if (!btn) return;
+  // prevent double-tap zoom issues on iOS
+  btn.addEventListener('touchend', function(e){ e.preventDefault(); btn.click(); }, {passive:false});
+})();
+
+
+/*
+  === Пасхалка r6tr0 / amir ===
+  Активация (в коде, чтобы игрок сам не догадался):
+  — Desktop: удерживай Shift и нажми "E", затем набери по буквам r6tr0 (нечувствительно к регистру).
+  — Mobile: сделай 3 быстрых тапа по левому логотипу, затем долгий тап 800мс.
+  Подсказки для теста разработчика оставлены в комментариях.
+*/
+(function eggInit(){
+  const mask = document.getElementById('eggMask');
+  const close = document.getElementById('eggClose');
+  const logo = document.querySelector('.brand'); // левый логотип/заголовок
+  function openEgg(){ mask.style.display='grid'; }
+  function closeEgg(){ mask.style.display='none'; }
+  close.addEventListener('click', closeEgg);
+
+  // Desktop combo: Shift+E then type r6tr0
+  let armed = false, buffer = '';
+  window.addEventListener('keydown', (e)=>{
+    if (e.key.toLowerCase()==='e' && e.shiftKey){ armed = true; buffer=''; }
+    else if (armed){
+      buffer += e.key.toLowerCase();
+      if (!'r6tr0'.startsWith(buffer)) { armed=false; buffer=''; }
+      else if (buffer==='r6tr0'){ openEgg(); armed=false; buffer=''; }
+    }
+  });
+
+  // Mobile: triple-tap then long-press
+  let taps = 0, lastTap = 0, pressTimer=null;
+  function onTap(){
+    const now = Date.now();
+    if (now - lastTap < 400) taps++; else taps=1;
+    lastTap = now;
+    if (taps>=3){
+      // ждём долгого удержания
+      if (pressTimer) clearTimeout(pressTimer);
+      logo.addEventListener('touchstart', ()=>{
+        pressTimer = setTimeout(openEgg, 800);
+      }, {once:true});
+      logo.addEventListener('touchend', ()=>{ if (pressTimer) clearTimeout(pressTimer); }, {once:true});
+    }
+  }
+  if (logo){
+    logo.addEventListener('click', onTap);
+    logo.addEventListener('touchend', (e)=>{ e.preventDefault(); onTap(); }, {passive:false});
+  }
+})();
+
+
+// Adjust chart heights for device
+(function adjustChartHeights(){
+  const isMobile = window.matchMedia('(max-width: 768px)').matches;
+  document.documentElement.setAttribute('data-device', isMobile ? 'mobile' : 'desktop');
+  const h = isMobile ? '240px' : '360px';
+  document.documentElement.style.setProperty('--chart-h', h);
+})();
+
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/3.0.1/jspdf.umd.min.js">
+// --- Ensure single-tap activation for Next button on touch devices ---
+(function ensureNextSingleTap(){
+  const btn = document.getElementById('btnNext');
+  if (!btn) return;
+  // prevent double-tap zoom issues on iOS
+  btn.addEventListener('touchend', function(e){ e.preventDefault(); btn.click(); }, {passive:false});
+})();
+
+
+/*
+  === Пасхалка r6tr0 / amir ===
+  Активация (в коде, чтобы игрок сам не догадался):
+  — Desktop: удерживай Shift и нажми "E", затем набери по буквам r6tr0 (нечувствительно к регистру).
+  — Mobile: сделай 3 быстрых тапа по левому логотипу, затем долгий тап 800мс.
+  Подсказки для теста разработчика оставлены в комментариях.
+*/
+(function eggInit(){
+  const mask = document.getElementById('eggMask');
+  const close = document.getElementById('eggClose');
+  const logo = document.querySelector('.brand'); // левый логотип/заголовок
+  function openEgg(){ mask.style.display='grid'; }
+  function closeEgg(){ mask.style.display='none'; }
+  close.addEventListener('click', closeEgg);
+
+  // Desktop combo: Shift+E then type r6tr0
+  let armed = false, buffer = '';
+  window.addEventListener('keydown', (e)=>{
+    if (e.key.toLowerCase()==='e' && e.shiftKey){ armed = true; buffer=''; }
+    else if (armed){
+      buffer += e.key.toLowerCase();
+      if (!'r6tr0'.startsWith(buffer)) { armed=false; buffer=''; }
+      else if (buffer==='r6tr0'){ openEgg(); armed=false; buffer=''; }
+    }
+  });
+
+  // Mobile: triple-tap then long-press
+  let taps = 0, lastTap = 0, pressTimer=null;
+  function onTap(){
+    const now = Date.now();
+    if (now - lastTap < 400) taps++; else taps=1;
+    lastTap = now;
+    if (taps>=3){
+      // ждём долгого удержания
+      if (pressTimer) clearTimeout(pressTimer);
+      logo.addEventListener('touchstart', ()=>{
+        pressTimer = setTimeout(openEgg, 800);
+      }, {once:true});
+      logo.addEventListener('touchend', ()=>{ if (pressTimer) clearTimeout(pressTimer); }, {once:true});
+    }
+  }
+  if (logo){
+    logo.addEventListener('click', onTap);
+    logo.addEventListener('touchend', (e)=>{ e.preventDefault(); onTap(); }, {passive:false});
+  }
+})();
+
+
+// Adjust chart heights for device
+(function adjustChartHeights(){
+  const isMobile = window.matchMedia('(max-width: 768px)').matches;
+  document.documentElement.setAttribute('data-device', isMobile ? 'mobile' : 'desktop');
+  const h = isMobile ? '240px' : '360px';
+  document.documentElement.style.setProperty('--chart-h', h);
+})();
+
+</script>
+<style>
+
+/* =======================================================================================
+   THEME & GLOBAL
+   ======================================================================================= */
+:root{
+  --bg:#0b1221; --panel:#0f172a; --ink:#e5e7eb; --ink2:#cbd5e1; --muted:#94a3b8;
+  --line:#1f2937; --ring:rgba(96,165,250,.35);
+  --accent:#2563eb; --green:#22c55e; --blue:#60a5fa; --amber:#f59e0b; --danger:#ef4444;
+  --radius:18px;
+}
+[data-theme="light"]{
+  --bg:#f8fafc; --panel:#ffffff; --ink:#0b1221; --ink2:#475569; --muted:#64748b;
+  --line:#e2e8f0; --ring:rgba(37,99,235,.25);
+}
+@media (prefers-color-scheme: light){
+  html[data-theme="auto"]{ --bg:#f8fafc; --panel:#ffffff; --ink:#0b1221; --ink2:#475569; --muted:#64748b; --line:#e2e8f0; --ring:rgba(37,99,235,.25);}
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0;
+  background:
+    radial-gradient(1200px 600px at 10% -10%, #1e3a8a14, transparent 60%),
+    radial-gradient(900px 800px at 100% 0%, #22c55e14, transparent 60%),
+    radial-gradient(1000px 800px at 0% 100%, #f59e0b14, transparent 60%),
+    var(--bg);
+  color:var(--ink);
+  font-family:"Inter",system-ui,Segoe UI,Roboto,Arial,sans-serif;line-height:1.5
+}
+.shell{max-width:1200px;margin:0 auto;padding:24px}
+header.appbar{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:18px}
+.brand{display:flex;align-items:center;gap:12px;font-weight:800;font-size:18px;letter-spacing:.3px}
+.pill{display:inline-flex;align-items:center;gap:8px;padding:6px 10px;border-radius:999px;background:var(--panel);border:1px solid var(--line);color:var(--ink2);font-weight:600}
+.btn{appearance:none;border:none;background:var(--panel);border:1px solid var(--line);color:var(--ink);padding:12px 18px;border-radius:14px;cursor:pointer;font-weight:700;transition:.18s transform ease,.18s background ease, box-shadow .18s}
+.btn:hover{transform:translateY(-1px);box-shadow:0 0 0 2px var(--ring)}
+.btn.primary{background:linear-gradient(135deg,#2563eb,#7c3aed);color:#fff;border:none}
+.btn.success{background:linear-gradient(135deg,#16a34a,#22c55e);color:#fff;border:none}
+.btn.ghost{background:transparent;border:1px dashed var(--line);color:var(--ink2)}
+.btn.warn{background:linear-gradient(135deg,#f59e0b,#f97316);color:#fff;border:none}
+.grid{display:grid;gap:16px}
+.grid.cols-2{grid-template-columns:1.2fr .8fr}
+.grid.cols-3{grid-template-columns:repeat(3,minmax(0,1fr))}
+.grid.cols-4{grid-template-columns:repeat(4,minmax(0,1fr))}
+@media (max-width:980px){ .grid.cols-2,.grid.cols-3,.grid.cols-4{grid-template-columns:1fr}}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);box-shadow:0 10px 30px rgba(0,0,0,.12)}
+.card.pad{padding:18px}
+.card.hero{position:relative;overflow:hidden}
+.hero .title{font-weight:800;font-size:30px;margin:12px 0 8px;letter-spacing:.2px}
+.hero .subtitle{color:var(--ink2);margin:0 0 18px}
+.small{font-size:12px;color:var(--muted)}
+.muted{color:var(--muted)}
+.screen{display:none}
+.screen.active{display:block;animation:fade .35s ease both}
+@keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.choices{display:grid;gap:12px}
+.choice{display:flex;align-items:flex-start;gap:14px;padding:14px;border-radius:14px;border:1px solid var(--line);background:var(--bg);cursor:pointer;transition:.18s ease}
+.choice:hover{box-shadow:0 0 0 2px var(--ring)}
+.choice.selected{outline:2px solid #2563eb;background:linear-gradient(180deg, var(--panel), var(--bg))}
+.choice .icon i{font-size:18px;color:var(--blue)}
+.choice .body{display:flex;flex-direction:column;gap:6px}
+.choice .title{font-weight:700}
+.choice .hint{color:var(--muted);font-size:13px}
+.metrics{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.metrics.four{grid-template-columns:repeat(4,minmax(0,1fr))}
+.kpi{padding:12px;border-radius:14px;background:var(--bg);border:1px solid var(--line)}
+.kpi h4{margin:0 0 8px;font-size:13px;color:var(--muted);font-weight:600}
+.kpi .value{font-size:24px;font-weight:800;letter-spacing:.2px}
+.kpi .delta{font-size:12px;font-weight:700}
+.delta.pos{color:#16a34a}
+.delta.neg{color:#ef4444}
+.side{display:flex;flex-direction:column;gap:12px}
+.panel{padding:14px;background:var(--bg);border:1px solid var(--line);border-radius:14px}
+.panel h3{margin:0 0 10px;font-weight:800}
+.panel .note{font-size:13px;color:var(--muted)}
+.history{display:flex;flex-direction:column;gap:10px}
+.fact{padding:10px;border-radius:12px;background:var(--panel);border:1px solid var(--line)}
+.progress{height:10px;border-radius:999px;background:var(--bg);border:1px solid var(--line);overflow:hidden}
+.progress>span{display:block;height:100%;width:0;background:linear-gradient(90deg,#22c55e,#60a5fa);transition:width .6s cubic-bezier(.2,.8,.2,1)}
+.legend{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}
+.tag{display:inline-flex;align-items:center;gap:8px;padding:6px 10px;border-radius:999px;border:1px dashed var(--line)}
+.dot{width:10px;height:10px;border-radius:50%}
+.toast{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:10px 14px;z-index:50;display:none}
+.toast.show{display:block;animation:fade .25s ease}
+.center{text-align:center}
+.hero-steps .panel{min-height:110px}
+.logo-title{font-weight:800}
+/* Charts container tweak */
+canvas{background:transparent}
+/* =======================================================================================
+   APP HEADER
+   ======================================================================================= */
+.fa-mark{width:40px;height:40px;display:block}
+@media (max-width:640px){ .fa-mark{width:32px;height:32px} .brand{font-size:16px} }
+/* На тач-устройствах ховер не нужен: иначе первый тап = hover, второй = click */
+@media (hover: none), (pointer: coarse) {
+  .btn:hover {
+    transform: none !important;
+    box-shadow: none !important;
+  }
+}
+
+/* А ховер-эффекты — только там, где есть “настоящая” мышь */
+@media (hover: hover) and (pointer: fine) {
+  .btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 0 0 2px var(--ring);
+  }
+}
+
+/* На всякий: тач-кликабельность и без подсветки */
+.btn {
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  pointer-events: auto;
+}
+
+
+#btnNext { position: relative; z-index: 2; }
+
+</style>
+<style>
+/* ===== Общие доработки для отзывчивости ===== */
+:root {
+  /* Высота графиков будет переопределяться из JS через --chart-h */
+  --chart-h: 360px;
+}
+
+/* Канвасы не должны растягивать страницу вбок */
+canvas { width: 100% !important; height: var(--chart-h) !important; }
+
+/* Уберём жёсткие минимальные ширины, которые ломают мобильную полосу */
+@media (max-width: 768px) {
+  .shell { padding: 14px; }
+  header.appbar { flex-wrap: wrap; gap: 10px; }
+  .brand { gap: 10px; font-size: 15px; }
+  .fa-mark { width: 28px; height: 28px; }
+
+  /* Кнопки: крупнее тач-таргеты, меньше поля */
+  .btn { padding: 11px 14px; border-radius: 12px; font-size: 14px; }
+  .btn.primary, .btn.success, .btn.warn { font-weight: 800; }
+
+  /* Карточки и панели: плотнее, но «воздух» сохраняем */
+  .card.pad { padding: 14px; }
+  .panel { padding: 12px; border-radius: 12px; }
+
+  /* Хиро-заголовки и подзаголовки компактнее */
+  .hero .title { font-size: 22px; margin-bottom: 6px; }
+  .hero .subtitle { font-size: 14px; }
+
+  /* Мини-чипы и бейджики */
+  .pill { padding: 5px 9px; border-radius: 999px; font-size: 12px; }
+
+  /* Глобальные сетки уже сворачиваются у тебя, оставим, но подправим отступы */
+  .grid { gap: 12px; }
+
+  /* Прогресс-панель не должна иметь фикс. min-width */
+  [style*="min-width:260px"] { min-width: 0 !important; width: 100% !important; }
+
+  /* KPI-плитки: 2 колонки вместо 3–4 */
+  .metrics { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
+  .metrics.four { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
+
+  /* Легенда графиков «в столбик», чтобы не переполнялась */
+  .legend { gap: 8px; }
+  .tag { padding: 5px 8px; font-size: 12px; }
+
+  /* Список фактов/истории – компактнее */
+  .fact { padding: 8px; }
+  .small { font-size: 11.5px; }
+
+  /* Блок стартовых настроек: селекты на всю ширину */
+  #selCountry, #selMode { width: 100% !important; }
+
+  /* Нижние CTA-кнопки – в столбик */
+  .cta-row { flex-direction: column; align-items: stretch; }
+}
+
+/* ===== Режимы через атрибут data-device ===== */
+html[data-device="mobile"] body { font-size: 15px; }
+html[data-device="desktop"] body { font-size: 16px; }
+
+/* Мобильные «крупные» тач-цели и отключение двойного тап-зума на кнопках */
+button, .btn { touch-action: manipulation; }
+
+/* Лёгкие тени уменьшим на мобильных, чтобы не «грязнить» экран */
+html[data-device="mobile"] .card { box-shadow: 0 8px 22px rgba(0,0,0,.10); }
+
+/* История/лог на результате — ограничим высоту, чтобы не растягивать экран */
+@media (max-width: 768px) {
+  #movesLog { max-height: 280px !important; }
+}
+</style>
+
+<style>
+@media (max-width: 768px) {
+  #finalChart { height: 240px !important; }
+  #trustChart { max-height: 180px !important; }
+}
+</style>
+
+<style>
+/* === Easter egg modal === */
+#eggMask{position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;place-items:center;z-index:80}
+#eggBox{background:var(--panel);border:1px solid var(--line);border-radius:18px;max-width:680px;width:92%;padding:18px;box-shadow:0 20px 60px rgba(0,0,0,.35)}
+#eggBox pre{white-space:pre;overflow:auto;font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;font-size:12px;color:var(--ink2);max-height:320px}
+#eggBox h2{margin:0 0 10px;font-weight:800}
+#eggClose{float:right}
+</style>
+
+
+<style>
+/* === Mobile text & layout fixes === */
+@media (max-width: 768px) {
+  .subtitle, .panel .note, p, li, .small, .muted {
+    overflow-wrap: anywhere;
+    word-break: break-word;
+    hyphens: auto;
+    line-height: 1.5;
+    text-align: left;
+  }
+  /* Steps grid: 2x2 on mobile for balance */
+  .grid.cols-4.hero-steps {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+  /* Ensure equal visual rhythm in hero card */
+  #howItWorks { margin-top: 10px; }
+  /* Prevent spacing collapse in buttons / labels */
+  label.small.muted, .btn, select.btn { white-space: normal; }
+  /* Avoid layout shifts due to long words/URLs in facts/history */
+  .history .fact { overflow-wrap: anywhere; }
+}
+</style>
+
+
+<style>
+/* Visual separation between rules and steps */
+.card.hero #rulesBlock { margin-bottom: 14px; }
+.grid.cols-4.hero-steps { margin-top: 6px; }
+@media (min-width: 1024px) {
+  .card.hero #rulesBlock { margin-bottom: 16px; }
+  .grid.cols-4.hero-steps { margin-top: 10px; }
+}
+</style>
+
+
+<style>
+@media (min-width: 1024px) {
+  /* Align "Стартовые настройки" block lower to match "Правила" top */
+  .card.hero .grid.cols-2 > div:nth-child(2) {
+    margin-top: 54px; /* tweak this offset as needed for alignment */
+  }
+
+  /* Increase font size inside the "Стартовые настройки" panel */
+  .card.hero .grid.cols-2 > div:nth-child(2) .panel {
+    font-size: 1.08rem;
+    line-height: 1.55;
+  }
+  .card.hero .grid.cols-2 > div:nth-child(2) .panel h3 {
+    font-size: 1.2rem;
+  }
+  .card.hero .grid.cols-2 > div:nth-child(2) .panel label.small.muted {
+    font-size: 1rem;
+  }
+  .card.hero .grid.cols-2 > div:nth-child(2) .panel .btn,
+  .card.hero .grid.cols-2 > div:nth-child(2) .panel select.btn {
+    font-size: 1rem;
+    padding: 10px 12px;
+  }
+}
+</style>
+
+
+<style>
+@media (min-width: 1024px) {
+  /* Equalize font size between "Как это работает" and other Правила items */
+  .card.hero #rulesBlock ul.small li {
+    font-size: 1.05rem;
+    line-height: 1.55;
+  }
+
+  /* Push "Стартовые настройки" block lower for better vertical alignment */
+  .card.hero .grid.cols-2 > div:nth-child(2) {
+    margin-top: 80px; /* increased from 54px */
+  }
+
+  /* Increase font size more in "Стартовые настройки" */
+  .card.hero .grid.cols-2 > div:nth-child(2) .panel {
+    font-size: 1.15rem;
+    line-height: 1.6;
+  }
+  .card.hero .grid.cols-2 > div:nth-child(2) .panel h3 {
+    font-size: 1.28rem;
+  }
+  .card.hero .grid.cols-2 > div:nth-child(2) .panel label.small.muted {
+    font-size: 1.08rem;
+  }
+  .card.hero .grid.cols-2 > div:nth-child(2) .panel .btn,
+  .card.hero .grid.cols-2 > div:nth-child(2) .panel select.btn {
+    font-size: 1.08rem;
+    padding: 12px 14px;
+  }
+}
+</style>
+
+
+<style>
+@media (min-width: 1024px) {
+  .card.hero .grid.cols-2 > div:nth-child(2) {
+    margin-top: 110px; /* pushed further down */
+  }
+}
+</style>
+
+
+<style>
+@media (min-width: 1024px) {
+  .card.hero .grid.cols-2 > div:nth-child(2) {
+    margin-top: 130px; /* pushed slightly further down */
+  }
+}
+</style>
+
+
+<style>
+@media (min-width: 1024px) {
+  .card.hero .grid.cols-2 > div:nth-child(2) {
+    margin-top: 120px; /* moved slightly up from 130px */
+  }
+}
+</style>
+
+
+<style>
+@media (min-width: 1024px) {
+  .card.hero .grid.cols-2 > div:nth-child(2) {
+    margin-top: 115px; /* nudged slightly up */
+  }
+}
+</style>
+
+
+<style>
+@media (min-width: 1024px) {
+  .card.hero .grid.cols-2 > div:nth-child(2) {
+    margin-top: 113px; /* fine-tuned */
+  }
+}
+</style>
+
+
+<style>
+@media (min-width: 1024px) {
+  .card.hero .grid.cols-2 > div:nth-child(2) {
+    margin-top: 116px; /* fine-tuned further */
+  }
+}
+</style>
+
+</head>
+<body>
+<div class="shell">
+  <!-- ШАПКА -->
+  <header class="appbar">
+    <div class="brand">
+      <!-- inline SVG "логотип" -->
+      <svg class="fa-mark" viewBox="0 0 100 100" aria-hidden="true">
+        <path d="M7 78 C30 72, 50 58, 64 36" fill="none" stroke="#9ca3af" stroke-width="3" />
+        <path d="M18 78 C28 72, 36 62, 42 50 L46 52 C38 70, 28 78, 18 78 Z" fill="#e5e7eb" stroke="#9ca3af" stroke-width="1.5"/>
+        <path d="M56 78 L56 40 L66 22 L66 78 Z" fill="#5472b8"/>
+        <path d="M70 78 L70 14 L76 8 L76 78 Z" fill="#cc4b46"/>
+      </svg>
+      <span class="logo-title">Торговые войны</span>
+      <span class="pill"><i class="fa-solid fa-graduation-cap"></i> учебная версия</span>
+    </div>
+    <div class="logo-wrap" style="display:flex;gap:10px;align-items:center">
+      <button id="btnTheme" class="btn ghost" title="Сменить режим (День/Ночь)"><i class="fa-solid fa-circle-half-stroke"></i> Сменить режим</button>
+      <!-- правый логотип -->
+      <svg class="fa-mark" viewBox="0 0 100 100" aria-label="Логотип университета">
+        <path d="M7 78 C30 72, 50 58, 64 36" fill="none" stroke="#9ca3af" stroke-width="3" />
+        <path d="M18 78 C28 72, 36 62, 42 50 L46 52 C38 70, 28 78, 18 78 Z" fill="#e5e7eb" stroke="#9ca3af" stroke-width="1.5"/>
+        <path d="M56 78 L56 40 L66 22 L66 78 Z" fill="#5472b8"/>
+        <path d="M70 78 L70 14 L76 8 L76 78 Z" fill="#cc4b46"/>
+      </svg>
+    </div>
+  </header>
+  <!-- START -->
+  <section id="screenStart" class="screen active">
+    <div class="card hero pad">
+      <div class="grid cols-2">
+        <div>
+           
+          <div class="pill" style="margin-bottom:10px"><i class="fa-solid fa-bolt"></i> 12 ходов • 15 минут</div>
+          <h1 class="title">Ты — экономический советник</h1>
+          <div class="panel" id="rulesBlock" style="margin-top:12px">
+            <h3><i class="fa-solid fa-list-check"></i> Правила</h3>
+             <p class="subtitle">
+            На каждом ходу появляется <b>сценарий</b>. Выбирай действие — мы показываем
+            <b>превью</b> (или скрываем, если выбран слепой режим) и <b>историческую аналогию</b>.
+            <u>Графики меняются только после «Далее»</u>
+          </p>
+              <ul class="small">
+<li><b>12 ходов</b>: на каждом ходу выбираешь одно действие</li>
+              <li><b>Превью</b>: ориентировочный эффект с учётом модификаторов страны</li>
+              <li><b>Случайные ситуации</b>: к первому выбранному варианту хода «прилипает» одно случайное событие (поддержка союзников, сбой поставок и т.д.)</li>
+              <li><b>Слепой</b>: в режиме «Слепой» превью скрыто до «Далее»</li>
+              <li><b>Итог</b>: после 12 хода — отчёт и графики</li>
+            </ul>
+          </div>
+        
+         
+         
+          <!-- 4 шага (требование) -->
+          <div class="grid cols-4 hero-steps">
+            <div class="panel"><div class="small muted">1</div><b>Выбери страну</b><div class="note">Уникальные модификаторы и ветвления</div></div>
+            <div class="panel"><div class="small muted">2</div><b>Выбери режим</b><div class="note">Нормальный • Тяжелый • Слепой (скрытое превью)</div></div>
+            <div class="panel"><div class="small muted">3</div><b>Делай ход</b><div class="note">Превью/история → «Далее» применяет эффект</div></div>
+            <div class="panel"><div class="small muted">4</div><b>Изучи результаты и скачай отчёт</b><div class="note">Резюме, индекс доверия, PDF/CSV</div></div>
+          </div>
+          <div class="panel" style="margin-top:10px">
+            <h3><i class="fa-solid fa-dice"></i> Случайные события </h3>
+            <div class="note">
+              На каждом ходу к <b>первому выбранному варианту</b> «прилипает» удача/неудача (100%).
+              Если вернёшься к нему — событие <b>сохранится</b>
+            </div>
+          </div>
+        </div>
+        <!-- Настройки старта -->
+        <div class="panel">
+          <h3><i class="fa-solid fa-flag"></i> Стартовые настройки</h3>
+          <label for="selCountry" class="small muted">Страна</label>
+          <select id="selCountry" class="btn" style="width:100%;margin:6px 0 12px;border-radius:12px">
+            <option value="USA">США</option>
+            <option value="CHN">Китай</option>
+            <option value="EU">Европейский Союз</option>
+            <option value="DEV">Развивающаяся</option>
+          </select>
+          <label for="selMode" class="small muted">Сложность</label>
+          <select id="selMode" class="btn" style="width:100%;margin:6px 0 12px;border-radius:12px">
+            <option value="NORMAL">Нормальный — превью видно</option>
+            <option value="HARD">Тяжелый — события сильнее</option>
+            <option value="FOG">Слепой — превью скрыто до применения</option>
+          </select>
+          <!-- Короткая памятка влияния (один выбор страны — без дублей) -->
+          <div id="countryNote" class="fact small" style="margin-top:8px">—</div>
+          <div class="cta-row" style="display:flex;gap:14px;justify-content:center;margin-top:14px">
+            <button id="btnStart" class="btn primary" style="font-size:18px;padding:34px 132px" onclick="startGame()"><i class="fa-solid fa-play"></i> Начать игру</button>
+            <button id="btnReportFromStart" class="btn ghost" style="font-size:18px;padding:14px 22px;display:none" disabled><i class="fa-solid fa-file-lines"></i> Изучи результаты и скачай отчёт</button>
+          </div>
+          <div class="small muted" style="margin-top:12px">Метрики: <b>ВВП</b> (индекс=100), <b>Экспорт</b> (индекс=100), <b>Инфляция</b> (%). Источники примеров: BIS/WTO/IMF/IEA и др</div>
+        </div>
+      </div>
+    </div>
+  </section>
+  <!-- SIM -->
+  <section id="screenSim" class="screen">
+    <div class="card pad">
+      <div style="display:flex;align-items:center;gap:14px;justify-content:space-between;margin-bottom:8px">
+        <div class="pill"><i class="fa-solid fa-earth-europe"></i> • <span id="lblCountry"></span> • <span id="lblMode"></span></div>
+        <div style="min-width:260px">
+          <div class="progress"><span id="bar"></span></div>
+          <div class="small muted" style="text-align:right;margin-top:6px">Ход <b id="lblStep">1</b> из <b id="lblTotal">—</b></div>
+        </div>
+      </div>
+      <div class="grid cols-2">
+        <div>
+          <h2 style="margin:8px 0 4px;font-weight:800">Сценарий</h2>
+          <div id="scenarioText" class="muted" style="margin-bottom:12px"></div>
+          <div class="choices" id="choices"></div>
+          <div class="center" style="margin-top:14px">
+            <button id="btnNext" class="btn success" disabled style="min-width:240px;font-size:18px"><i class="fa-solid fa-arrow-right"></i> Далее</button>
+          </div>
+        </div>
+        <aside class="side">
+          <div class="panel">
+            <h3><i class="fa-solid fa-square-poll-vertical"></i> Превью </h3>
+            <div id="fogMask" class="small muted" style="display:none;margin-bottom:6px"><i class="fa-solid fa-eye-slash"></i> В режиме Fog влияние скрыто до нажатия «Далее».</div>
+            <div class="metrics" id="previewMetrics">
+              <div class="kpi"><h4>ВВП, индекс</h4><div class="value" id="pvGdp">100.0</div><div class="delta" id="pvGdpDelta">—</div></div>
+              <div class="kpi"><h4>Экспорт, индекс</h4><div class="value" id="pvExp">100.0</div><div class="delta" id="pvExpDelta">—</div></div>
+              <div class="kpi"><h4>Инфляция, %</h4><div class="value" id="pvCpi">2.0%</div><div class="delta" id="pvCpiDelta">—</div></div>
+            </div>
+            <div class="note" style="margin-top:8px">Это <b>учебная аналогия</b> с учётом модификатора страны и «прилипшего» события. Реальные графики меняются только после «Далее».</div>
+          </div>
+          <div class="panel">
+            <h3><i class="fa-solid fa-book"></i> Историческая справка</h3>
+            <div class="history" id="historyBox">
+              <div class="fact"><div class="small">Нажми на вариант — покажем пример из истории: «что сделали → к чему привело» (с источниками).</div></div>
+            </div>
+          </div>
+        </aside>
+      </div>
+    </div>
+    <div class="card pad" style="margin-top:14px">
+      <div class="grid cols-2">
+        <div>
+          <h3 style="margin:0 0 8px">Экономическая панель</h3>
+          <canvas id="chart"></canvas>
+          <div class="legend">
+            <span class="tag"><span class="dot" style="background:#22c55e"></span> ВВП (индекс)</span>
+            <span class="tag"><span class="dot" style="background:#60a5fa"></span> Экспорт (индекс)</span>
+            <span class="tag"><span class="dot" style="background:#f59e0b"></span> Инфляция (%)</span>
+          </div>
+        </div>
+        <div>
+          <h3 style="margin:0 0 8px">Краткий итог хода</h3>
+          <div class="panel"><div id="turnSummary" class="note">Графики меняются только после «Далее». В Fog превью скрывается.</div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+  <!-- RESULT -->
+  <section id="screenResult" class="screen">
+    <div id="resultToPrint" class="card pad">
+      <h2 style="margin:0 0 8px;font-weight:800"><i class="fa-solid fa-flag-checkered"></i> Итоговый отчёт</h2>
+      <div class="grid cols-2">
+        <div>
+          <div class="metrics four">
+            <div class="kpi"><h4>ВВП, финальный индекс</h4><div class="value" id="outGdp">—</div></div>
+            <div class="kpi"><h4>Экспорт, финальный индекс</h4><div class="value" id="outExp">—</div></div>
+            <div class="kpi"><h4>Инфляция, финальный %</h4><div class="value" id="outCpi">—</div></div>
+            <div class="kpi"><h4>Доверие партнёров</h4><div class="value" id="outTrust">—</div></div>
+          </div>
+          <div class="panel" style="margin-top:12px">
+            <h3>Таймлайн результатов (внутр. шкала: месяцы)</h3>
+            <canvas id="finalChart"></canvas>
+          </div>
+          <div class="panel" style="margin-top:12px">
+            <h3>Доверие партнёров (постфактум)</h3>
+            <canvas id="trustChart" style="max-height:220px"></canvas>
+            <div class="small muted" id="trustNote" style="margin-top:8px">>—</div>
+          </div>
+        </div>
+        <div>
+          <div class="panel">
+            <h3><i class="fa-solid fa-scroll"></i> Резюме и разбор действий</h3>
+            <div id="resultText" class="note">—</div>
+          </div>
+          <div class="panel" style="margin-top:12px">
+            <h3><i class="fa-solid fa-book-open"></i> Лог ходов (с источниками)</h3>
+            <div id="movesLog" class="small" style="max-height:360px;overflow:auto"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- EXPORT -->
+    <div class="card pad" style="margin-top:14px">
+      <h3 style="margin:0 0 8px"><i class="fa-solid fa-download"></i> Экспорт отчёта</h3>
+      <div class="grid cols-2">
+        <div class="panel">
+          <h3>PDF</h3>
+          <div class="note" style="margin-bottom:10px">PDF повторяет финальную страницу: метрики, графики, логи и источники (включая доверие)</div>
+          <button id="btnPdf" class="btn success"><i class="fa-solid fa-file-pdf"></i> Скачать PDF</button>
+        </div>
+        <div class="panel">
+          <h3>CSV</h3>
+          <div class="note" style="margin-bottom:10px">Структурированный лог: сценарий, выбор, Δметрики, событие, источники</div>
+          <button id="btnCsv" class="btn ghost"><i class="fa-solid fa-file-csv"></i> Скачать CSV</button>
+        </div>
+      </div>
+    </div>
+    <!-- PLAY AGAIN -->
+    <div class="card pad center" style="margin-top:14px">
+      <button id="btnAgain" class="btn primary" style="font-size:20px;padding:16px 26px"><i class="fa-solid fa-rotate"></i> Сыграть ещё</button>
+    </div>
+  </section>
+  <div id="toast" class="toast"></div>
+
+  <div class="small muted center" style="margin-top:16px">v3.2</div>
+
+<!-- Easter egg modal -->
+<div id="eggMask" role="dialog" aria-modal="true" aria-label="About the developer">
+  <div id="eggBox">
+    <button id="eggClose" class="btn">×</button>
+    <h2>r6tr0</h2>
+    <div class="small muted" style="margin:-6px 0 8px">developer • <span style="letter-spacing:.15em">amir</span></div>
+    <pre>
+                 __====-_  _-====__
+           _--^^^#####//      \\#####^^^--_
+        _-^##########// (    ) \\##########^-_
+       -############//  |\^^/|  \\############-
+     _/############//   (@::@)   \\############\_
+    /#############((     \__/     ))#############\
+   -#################\\    (oo)   //#################-
+  -###################\\  / VV \ //###################-
+ -####################/ / |  __  | \ \####################-
+ -###################( (  \____/  ) )###################-
+  -###################\\  /    \  //###################-
+   -###################\\/  /\  \\//###################-
+     ^^^\#############//   /  \   \\#############//^^^
+         \\##########//   (____)   \\##########//
+           \\########/               \########//
+             \\_____/                 \_____//
+    </pre>
+    <div class="small muted">Найдено пасхалкой: desktop: Shift + E, затем введите "r6tr0"; mobile: тройной тап по логотипу и длинное удержание.</div>
+  </div>
+</div>
+
+</div>
+<script>
+/* =======================================================================================
+   HELPERS / THEME
+   ======================================================================================= */
+const $ = (sel) => document.querySelector(sel);
+const fmt = (n, d=1) => Number(n).toFixed(d);
+const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
+const deepCopy = (o) => JSON.parse(JSON.stringify(o));
+const toast = (m)=>{ const t=$('#toast'); t.textContent=m; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'), 1700); };
+(function themeInit(){
+  const root = document.documentElement;
+  const saved = localStorage.getItem('theme');
+  if(saved){ root.setAttribute('data-theme', saved); }
+  $('#btnTheme').addEventListener('click', ()=>{
+    const cur = root.getAttribute('data-theme') || 'auto';
+    const next = cur==='light' ? 'dark' : (cur==='dark' ? 'auto' : 'light');
+    root.setAttribute('data-theme', next);
+    localStorage.setItem('theme', next);
+    toast(next==='light'?'Режим: День': next==='dark'?'Режим: Ночь':'Режим: Авто');
+  });
+})();
+/* =======================================================================================
+   STATE
+   ======================================================================================= */
+let country = 'USA';
+let mode = 'NORMAL'; // NORMAL | HARD | FOG
+let stepIndex = 0;
+let stepsTotal = 12;
+const baseState = { gdpIdx:100.0, expIdx:100.0, cpi:2.0 };
+let state = deepCopy(baseState);
+let timeline = [{...state}];
+let months = [0];
+let selections = Array(stepsTotal).fill(null);
+let stepRandom = Array(stepsTotal).fill(null);
+let resultsLog = [];
+const notesByCountry = {
+  USA:'США: санкции; тарифная эскалация бьёт по экспорту',
+  CHN:'Китай: диверсификация цепочек/логистика усиливают экспорт',
+  EU:'ЕС: переговоры эффективнее; энергошоки гасятся быстрее',
+  DEV:'Развивающаяся: выше волатильность → риск/шанс'
+};
+/* усиленные модификаторы (сильно влияют на эффекты) */
+const countryMods = {
+  USA:{ gdp:1.00, exp:0.95, cpi:1.08, sanctions:1.12, tech:1.10, tariffExp:0.92 },
+  CHN:{ gdp:1.03, exp:1.12, cpi:0.94, diversify:1.12, logistics:1.06 },
+  EU :{ gdp:1.04, exp:1.00, cpi:0.93, talks:1.07, energy:1.06 },
+  DEV:{ gdp:1.06, exp:1.06, cpi:1.08, riskHigh:true, success:1.18, fail:1.12 }
+};
+/* случайные события — липнут к первому выбранному варианту */
+const randomPool = [
+  { key:'ally', text:'Поддержка союзников: пакет помощи и доступ к рынкам', gdp:+1.2, exp:+1.0, cpi:+0.0 },
+  { key:'retal', text:'Ответные меры партнёров: временный уход инвестора', gdp:-1.0, exp:-1.6, cpi:+0.2 },
+  { key:'supply',text:'Срыв поставок критичных компонентов', gdp:-0.6, exp:-1.1, cpi:+0.5 },
+  { key:'tech', text:'Технологический прорыв локальной индустрии', gdp:+1.4, exp:+0.8, cpi:-0.1 },
+  { key:'boom', text:'Глобальный подъём спроса на сырьё', gdp:+0.8, exp:+1.3, cpi:+0.2 },
+];
+/* =======================================================================================
+   SCENARIOS (BASE 12) — с тегами и источниками для истории
+   ======================================================================================= */
+const scenariosBase = [
+  { id:'steel-dumping', text:'Демпинг стали давит на отрасль. Что делаем?',
+    choices:[
+      { id:'high-tariff', icon:'fa-solid fa-industry', label:'Высокие тарифы (нацбезопасность)', hint:'Быстрая защита → риск ответных мер', effect:{ gdp:-1.3, exp:-1.9, cpi:+0.3 }, tags:['тарифы','эскалация'], history:'США в 2018 ввели «232» пошлины; часть партнёров ответила; споры ушли в ВТО/переговоры.', sources:[{label:'BIS — Section 232',url:'https://www.bis.gov/about-bis/bis-leadership-and-offices/SIES/section-232-investigations/section-232-steel-aluminum'}] },
+      { id:'anti-dumping', icon:'fa-solid fa-scale-balanced', label:'Антидемпинговые меры (точечно)', hint:'Следуем процедурам и таргетируем', effect:{ gdp:+0.3, exp:-0.4, cpi:+0.1 }, tags:['антидемпинг'], history:'ЕС применяет антидемпинг к стали — защита без тотального подорожания входов.', sources:[{label:'EC — steel safeguard контекст',url:'https://policy.trade.ec.europa.eu/news/commission-initiates-review-steel-safeguard-protect-eu-steel-industry-2024-12-17_en'}] },
+      { id:'wait-see', icon:'fa-regular fa-clock', label:'Выжидать', hint:'Цены низкие, но отрасль страдает', effect:{ gdp:-0.6, exp:+0.0, cpi:+0.0 }, tags:['выжидание'], history:'Игнорирование демпинга → падение загрузки/зависимость от импорта.', sources:[] }
+    ]},
+  { id:'sanctions-tech', text:'Союзники обсуждают ограничения на высокие технологии. Поддержать жёсткий пакет?',
+    choices:[
+      { id:'full-controls', icon:'fa-solid fa-microchip', label:'Строгие техконтроли', hint:'Удар по оборудованию/ПО', effect:{ gdp:-0.5, exp:-1.0, cpi:+0.2 }, tags:['санкции','техконтроль','чипы'], history:'Ограничения 2022–2023 снижали экспорт соответствующих товаров и усложняли сервис.', sources:[{label:'BIS 07.10.2022',url:'https://www.bis.gov/press-release/'}] },
+      { id:'partial-controls', icon:'fa-solid fa-sliders', label:'Точечные контролы', hint:'Сужаем до ВПК', effect:{ gdp:+0.1, exp:-0.3, cpi:+0.1 }, tags:['таргетировано','техконтроль'], history:'Таргетированные списки/лицензии оставляют «чистые» каналы гражданского сектора.', sources:[] },
+      { id:'neutral', icon:'fa-solid fa-handshake-simple', label:'Нейтралитет/диалог', hint:'Снижаем неопределённость', effect:{ gdp:+0.2, exp:+0.2, cpi:+0.0 }, tags:['дипломатия'], history:'Паузы в эскалации поддерживали торговлю/инвестиции.', sources:[{label:'IMF — trade tensions',url:'https://www.imf.org/'}] }
+    ]},
+  { id:'countermeasure', text:'Против нас ввели пошлины/санкции. Как отвечаем?',
+    choices:[
+      { id:'mirror', icon:'fa-solid fa-reply', label:'Зеркальные меры', hint:'Сигнал силы, но удар по торговле', effect:{ gdp:-0.7, exp:-1.4, cpi:+0.2 }, tags:['эскалация'], history:'В 2018–2019 ответные меры с обеих сторон сжимали торговлю.', sources:[{label:'IMF',url:'https://www.imf.org/'}] },
+      { id:'diversify', icon:'fa-solid fa-route', label:'Диверсификация рынков/цепочек', hint:'Устойчивость ↑', effect:{ gdp:+0.6, exp:+0.8, cpi:-0.1 }, tags:['диверсификация'], history:'Производственные стимулы/логистика перераспределяли экспорт и снижали уязвимость.', sources:[{label:'EnterpriseSG',url:'https://www.enterprisesg.gov.sg/'}] },
+      { id:'wto', icon:'fa-solid fa-gavel', label:'Правовой путь (ВТО)', hint:'Дольше, но без эскалации', effect:{ gdp:+0.0, exp:+0.1, cpi:+0.0 }, tags:['право'], history:'Часть споров «232» рассматривалась в ВТО.', sources:[] }
+    ]},
+  { id:'safeguard-energy', text:'Сырьевой/энергетический стресс. Поддержать отрасль или открыть рынки?',
+    choices:[
+      { id:'subsidy', icon:'fa-solid fa-battery-half', label:'Субсидии локализации/зелёной энергии', hint:'Инвестиции/занятость', effect:{ gdp:+0.7, exp:-0.2, cpi:+0.2 }, tags:['субсидии','зелёная повестка'], history:'Климатические пакеты стимулируют инвестиции и рабочие места.', sources:[] },
+      { id:'quotas', icon:'fa-solid fa-chart-area', label:'Квоты/защитные меры', hint:'Стабильность отрасли, риск дефицитов', effect:{ gdp:-0.2, exp:-0.8, cpi:+0.3 }, tags:['квоты','safeguard'], history:'С 2018 ЕС держит защитные меры на сталь; продлены до 2026.', sources:[] },
+      { id:'open', icon:'fa-solid fa-arrows-spin', label:'Открытые рынки/хабовая стратегия', hint:'FTA и логистика', effect:{ gdp:+0.6, exp:+0.9, cpi:+0.0 }, tags:['открытость','хабы','диверсификация'], history:'Страны-хабы выигрывали за счёт логистики и доступа к рынкам.', sources:[{label:'EnterpriseSG',url:'https://www.enterprisesg.gov.sg/'}] }
+    ]},
+  { id:'chip-war', text:'Ужесточение экспортконтроля в микроэлектронике. Как действуем?',
+    choices:[
+      { id:'restrict-more', icon:'fa-solid fa-microchip', label:'Ужесточить контроль', hint:'Срезаем доступ к оборудованию', effect:{ gdp:-0.4, exp:-0.9, cpi:+0.1 }, tags:['чипы','контроль','санкции'], history:'Ужесточение правил закрывает лазейки к высокопроизводительным чипам/оборудованию.', sources:[] },
+      { id:'cooperate', icon:'fa-regular fa-handshake', label:'Секторальное сотрудничество', hint:'Стандарты/безопасность цепочек', effect:{ gdp:+0.3, exp:+0.4, cpi:+0.0 }, tags:['диалог','переговоры'], history:'Совместные стандарты/гарантии снижают неопределённость и поддерживают инвестиции.', sources:[{label:'IMF',url:'https://www.imf.org/'}] },
+      { id:'status-quo', icon:'fa-regular fa-circle', label:'Статус-кво', hint:'Без резких движений', effect:{ gdp:+0.0, exp:+0.0, cpi:+0.0 }, tags:['ожидание'], history:'Ситуация остаётся стабильной, ожидания нейтральны.', sources:[] }
+    ]},
+  { id:'energy-shock', text:'Энергокризис: ограничить «запрещённый» импорт или диверсифицировать?',
+    choices:[
+      { id:'ban', icon:'fa-solid fa-ban', label:'Жёсткий импортный запрет', hint:'Волатильность цен ↑', effect:{ gdp:-0.4, exp:-0.5, cpi:+0.6 }, tags:['санкции','энергия'], history:'Эмбарго → волатильность и перенастройка поставок.', sources:[] },
+      { id:'partial', icon:'fa-solid fa-filter', label:'Частичный запрет + замещение', hint:'Плавнее перестройка', effect:{ gdp:-0.1, exp:-0.2, cpi:+0.3 }, tags:['адаптация','энергия'], history:'Ограничения + СПГ снижали дефициты и сглаживали шок.', sources:[] },
+      { id:'diversifyLNG', icon:'fa-solid fa-ship', label:'Диверсификация (СПГ/альтернатива)', hint:'Инфраструктура/контракты', effect:{ gdp:+0.3, exp:+0.1, cpi:+0.1 }, tags:['диверсификация','энергия','открытость'], history:'Регазификация и долгосрочные контракты поддерживали экспорт и снижали риски.', sources:[] }
+    ]},
+  { id:'green-subsidy', text:'Зелёная гонка: поддерживать ВИЭ/электротранспорт?',
+    choices:[
+      { id:'big-green', icon:'fa-solid fa-solar-panel', label:'Масштабные зелёные субсидии', hint:'Рабочие места/инвестиции', effect:{ gdp:+0.6, exp:-0.1, cpi:+0.2 }, tags:['IRA','субсидии'], history:'Крупные пакеты ускоряли инвестиции и создавали рабочие места.', sources:[] },
+      { id:'minimal', icon:'fa-regular fa-lemon', label:'Минимальные стимулы', hint:'Рост без перегрева', effect:{ gdp:+0.2, exp:+0.0, cpi:+0.1 }, tags:['умеренно'], history:'Ограниченные стимулы — меньший мультипликатор/трения.', sources:[] },
+      { id:'none', icon:'fa-regular fa-circle-xmark', label:'Без вмешательства', hint:'Риск отставания', effect:{ gdp:-0.3, exp:-0.2, cpi:+0.0 }, tags:['laissez-faire'], history:'При глобальной гонке субсидий отсутствие стимулов ведёт к оттоку проектов.', sources:[] }
+    ]},
+  { id:'rare-earths', text:'Ограничить экспорт редкоземов ради добавленной стоимости дома?',
+    choices:[
+      { id:'restrict-exports', icon:'fa-solid fa-mountain', label:'Экспортные ограничения', hint:'Риск претензий в ВТО', effect:{ gdp:-0.3, exp:-0.7, cpi:+0.1 }, tags:['экспортные-ограничения'], history:'Попытки ограничивать экспорт редкоземов приводили к спорам в ВТО.', sources:[] },
+      { id:'develop-domestic', icon:'fa-solid fa-recycle', label:'Развивать добычу/переработку внутри', hint:'Долго, но устойчиво', effect:{ gdp:+0.2, exp:+0.1, cpi:+0.0 }, tags:['индустриальная-политика'], history:'Инвестиции в переработку повышают автономию без спорных ограничений.', sources:[] },
+      { id:'supply-fta', icon:'fa-solid fa-handshake', label:'Сделки о безопасных поставках', hint:'Долгосрочная предсказуемость', effect:{ gdp:+0.3, exp:+0.2, cpi:+0.0 }, tags:['переговоры','открытость'], history:'Долгосрочные соглашения/FTA дают устойчивость цепочкам.', sources:[] }
+    ]},
+  { id:'aircraft-dispute', text:'Спор по субсидиям в авиапроме. Как поступим?',
+    choices:[
+      { id:'retaliate', icon:'fa-solid fa-hammer', label:'Ответные тарифы', hint:'Эскалация/издержки', effect:{ gdp:-0.4, exp:-0.6, cpi:+0.1 }, tags:['эскалация','тарифы'], history:'Тарифная эскалация повышает издержки обеих сторон.', sources:[] },
+      { id:'cooperative-framework', icon:'fa-solid fa-scale-balanced', label:'Кооперативная рамка', hint:'Тарифы заморожены', effect:{ gdp:+0.3, exp:+0.5, cpi:+0.0 }, tags:['переговоры'], history:'США и ЕС в 2021 договорились о кооперативной рамке и приостановили тарифы.', sources:[] },
+      { id:'litigate', icon:'fa-solid fa-gavel', label:'Дальше судиться', hint:'Долго/затратно', effect:{ gdp:+0.0, exp:+0.1, cpi:+0.0 }, tags:['право'], history:'Судебные раунды годами поддерживают неопределённость.', sources:[] }
+    ]},
+  /* дополнительные базовые шаги, чтобы суммарно было 12 */
+  { id:'agri-export', text:'Рост цен на продовольствие. Ограничить экспорт?',
+    choices:[
+      { id:'ban-export', icon:'fa-solid fa-wheat-awn', label:'Запретить экспорт ключевого товара', hint:'Домашние цены вниз, экспорт страдает', effect:{ gdp:-0.2, exp:-0.9, cpi:-0.2 }, tags:['экспорт-контроль'], history:'Запреты у крупных экспортёров повышали мировые цены, снижая внутренние.', sources:[] },
+      { id:'targeted-relief', icon:'fa-solid fa-basket-shopping', label:'Адресные субсидии потребителям', hint:'Избегаем глобального шока', effect:{ gdp:+0.1, exp:+0.0, cpi:-0.1 }, tags:['субсидии'], history:'Часто дешевле смягчать удар адресной поддержкой, чем рушить экспорт.', sources:[] },
+      { id:'import-cut-tariff', icon:'fa-solid fa-door-open', label:'Снизить импортные тарифы временно', hint:'Смягчаем цены без удара по экспорту', effect:{ gdp:+0.1, exp:+0.1, cpi:-0.1 }, tags:['открытость'], history:'Временное снижение тарифов охлаждало цены.', sources:[] }
+    ]},
+  { id:'finance-sanctions', text:'Партнёры обсуждают вторичные санкции. Как реагируем?',
+    choices:[
+      { id:'ffi-secondary', icon:'fa-solid fa-link-slash', label:'Поддержать вторичные санкции', hint:'Сильное давление; обход — риск', effect:{ gdp:-0.3, exp:-1.0, cpi:+0.2 }, tags:['санкции','финансы'], history:'OFAC разъяснял риски для иностр. финорганизаций при обходе ограничений.', sources:[] },
+      { id:'targeted', icon:'fa-solid fa-bullseye', label:'Точечные меры и контроль рисков', hint:'Уменьшаем коллатеральный вред', effect:{ gdp:+0.1, exp:-0.3, cpi:+0.1 }, tags:['таргетинг','санкции'], history:'Точечные запреты/лицензии сдерживают ВПК-каналы, сохраняя гражданские.', sources:[] },
+      { id:'alt-currencies', icon:'fa-solid fa-yen-sign', label:'Расчёты в альтернативных валютах', hint:'Обход узких мест', effect:{ gdp:+0.2, exp:+0.3, cpi:+0.0 }, tags:['платежи','диверсификация'], history:'Двусторонние расчёты в альтернативных валютах поддерживали часть торговли.', sources:[] }
+    ]},
+  { id:'grand-finale', text:'Финал: стратегическая линия при глобальном протекционизме.',
+    choices:[
+      { id:'barriers', icon:'fa-solid fa-shield-halved', label:'Усилить барьеры', hint:'Изоляция отраслей', effect:{ gdp:-0.8, exp:-1.6, cpi:+0.5 }, tags:['протекционизм','эскалация'], history:'Широкие барьеры и встречные меры тормозили рост и торговлю.', sources:[] },
+      { id:'deals', icon:'fa-solid fa-handshake', label:'Дипломатия и сделки', hint:'Снижаем тарифы/споры', effect:{ gdp:+0.8, exp:+1.0, cpi:+0.1 }, tags:['переговоры','открытость'], history:'«Перемирия» и сделки возвращали часть торговли.', sources:[] },
+      { id:'adapt', icon:'fa-solid fa-compass', label:'Адаптация/диверсификация', hint:'Устойчивость цепочек', effect:{ gdp:+0.4, exp:+0.5, cpi:+0.1 }, tags:['устойчивость','диверсификация'], history:'Инвестиции в логистику/регаз/заменители снижали риски.', sources:[] }
+    ]}
+];
+/* COUNTRY-SPECIFIC INSERTS — по 3 подмены, усиливаем реиграбельность */
+const countryInserts = {
+  USA: [
+    { at:1, id:'usa-ira', text:'США: расширить зелёные кредиты IRA или тарифы на EV?', choices:[
+      { id:'ira-boost', icon:'fa-solid fa-leaf', label:'Увеличить кредиты IRA', hint:'Инвест. бум, напряжение с партнёрами', effect:{ gdp:+0.7, exp:-0.2, cpi:+0.2 }, tags:['субсидии','IRA'], history:'Расширение стимулов ускоряло проекты; споры по конкуренции.', sources:[] },
+      { id:'ev-tariff', icon:'fa-solid fa-car', label:'Тарифы на импорт EV', hint:'Защита рынка, риски ответных мер', effect:{ gdp:-0.2, exp:-0.6, cpi:+0.1 }, tags:['тарифы','эскалация'], history:'Авто-тарифы быстро эскалируют и бьют по экспорту компонентов.', sources:[] },
+      { id:'fta-americas', icon:'fa-solid fa-handshake-simple', label:'FTA в Америке', hint:'Открываем рынки', effect:{ gdp:+0.4, exp:+0.6, cpi:+0.0 }, tags:['переговоры','открытость'], history:'Региональные соглашения поддерживали экспорт/инвестиции.', sources:[] }
+    ]},
+    { at:6, id:'usa-chips', text:'США: новая волна экспортконтроля по чипам — жёстче или координация?', choices:[
+      { id:'harder', icon:'fa-solid fa-microchip', label:'Ужесточить', hint:'Сильнее эффект, выше издержки', effect:{ gdp:-0.5, exp:-1.0, cpi:+0.1 }, tags:['санкции','чипы','техконтроль'], history:'Ужесточение снижает поставки оборудования и усложняет сервис.', sources:[] },
+      { id:'coord', icon:'fa-solid fa-people-arrows', label:'Координация с ЕС/Японией', hint:'Сглаживаем риски', effect:{ gdp:+0.2, exp:+0.2, cpi:+0.0 }, tags:['переговоры'], history:'Совместные стандарты смягчают шоки и улучшают ожидания.', sources:[] },
+      { id:'pause', icon:'fa-solid fa-circle-pause', label:'Пауза и оценка', hint:'Снижаем неопределённость', effect:{ gdp:+0.1, exp:+0.1, cpi:+0.0 }, tags:['ожидание'], history:'Паузы временно поддерживали рынки.', sources:[] }
+    ]},
+    { at:11, id:'usa-fin', text:'США: продлевать вторичные санкции на финканалы?', choices:[
+      { id:'extend', icon:'fa-solid fa-link-slash', label:'Расширить', hint:'Сильное давление', effect:{ gdp:-0.3, exp:-1.1, cpi:+0.2 }, tags:['санкции','финансы'], history:'Усиление рисков для банков при обходе ограничений.', sources:[] },
+      { id:'target', icon:'fa-solid fa-bullseye', label:'Точечно', hint:'Снижаем коллатеральный вред', effect:{ gdp:+0.1, exp:-0.3, cpi:+0.1 }, tags:['таргетинг'], history:'Таргетинг сохраняет гражданские каналы.', sources:[] },
+      { id:'dialogue', icon:'fa-solid fa-comments', label:'Диалог и комплаенс', hint:'Предсказуемость', effect:{ gdp:+0.2, exp:+0.2, cpi:+0.0 }, tags:['переговоры'], history:'Окна комплаенса понижают премию риска.', sources:[] }
+    ]}
+  ],
+  CHN: [
+    { at:2, id:'chn-pli', text:'Китай: расширить PLI/дружественный nearshoring для экспорта?', choices:[
+      { id:'expand-pli', icon:'fa-solid fa-industry', label:'Расширить PLI', hint:'Экспорт ↑, инфляция ↓', effect:{ gdp:+0.5, exp:+1.0, cpi:-0.1 }, tags:['диверсификация'], history:'Производственные стимулы перераспределяют экспорт к ЕС/США/ЮВА.', sources:[] },
+      { id:'focus-dom', icon:'fa-solid fa-house', label:'Фокус на внутренний спрос', hint:'Меньше внешней волатильности', effect:{ gdp:+0.4, exp:+0.1, cpi:+0.0 }, tags:['устойчивость'], history:'Смещение к внутреннему спросу снижает внешние риски.', sources:[] },
+      { id:'statusq', icon:'fa-solid fa-circle', label:'Статус-кво', hint:'Без резких шагов', effect:{ gdp:+0.0, exp:+0.0, cpi:+0.0 }, tags:['ожидание'], history:'Стабильно, но без улучшений.', sources:[] }
+    ]},
+    { at:7, id:'chn-minerals', text:'Китай: контроль за вывозом критичных минералов?', choices:[
+      { id:'tight', icon:'fa-solid fa-mountain', label:'Ужесточить контроль', hint:'Короткий выигрыш, споры в ВТО', effect:{ gdp:-0.2, exp:-0.7, cpi:+0.1 }, tags:['экспортные-ограничения'], history:'Ограничения по редкоземам → споры и ответные меры.', sources:[] },
+      { id:'longterm', icon:'fa-solid fa-recycle', label:'Развивать переработку внутри', hint:'Устойчивый эффект', effect:{ gdp:+0.2, exp:+0.2, cpi:+0.0 }, tags:['индустрия'], history:'Инвестиции повышают автономию.', sources:[] },
+      { id:'deals', icon:'fa-solid fa-handshake', label:'Сделки о безопасных поставках', hint:'Снижаем риски', effect:{ gdp:+0.3, exp:+0.4, cpi:+0.0 }, tags:['переговоры'], history:'Долгосрочные соглашения повышают устойчивость цепочек.', sources:[] }
+    ]},
+    { at:12, id:'chn-payments', text:'Китай: расширять расчёты в альтернативных валютах?', choices:[
+      { id:'expand', icon:'fa-solid fa-yen-sign', label:'Расширять', hint:'Снижаем долларовую зависимость', effect:{ gdp:+0.2, exp:+0.5, cpi:+0.0 }, tags:['платежи'], history:'Рост расчётов в нацвалютах поддерживает торговлю.', sources:[] },
+      { id:'selective', icon:'fa-solid fa-filter', label:'Выборочно', hint:'Минимизируем риски санкций', effect:{ gdp:+0.1, exp:+0.2, cpi:+0.0 }, tags:['таргетинг'], history:'Выборочность снижает риски вторичных мер.', sources:[] },
+      { id:'keep', icon:'fa-solid fa-pause', label:'Без изменений', hint:'Предсказуемость', effect:{ gdp:+0.0, exp:+0.0, cpi:+0.0 }, tags:['ожидание'], history:'Стабильно.', sources:[] }
+    ]}
+  ],
+  EU: [
+    { at:3, id:'eu-talks', text:'ЕС: как вести спор по стали — усилить защитные меры или идти в переговоры?', choices:[
+      { id:'safeguard-eu', icon:'fa-solid fa-shield', label:'Продлить safeguard', hint:'Защита отрасли', effect:{ gdp:+0.2, exp:-0.3, cpi:+0.1 }, tags:['safeguard'], history:'ЕС продлевает защитные меры на сталь до 2026.', sources:[] },
+      { id:'talks-eu', icon:'fa-solid fa-comments', label:'Переговорная рамка', hint:'Снижаем неопределённость', effect:{ gdp:+0.5, exp:+0.4, cpi:-0.1 }, tags:['переговоры'], history:'Переговоры понижают риск эскалации.', sources:[] },
+      { id:'status-eu', icon:'fa-solid fa-circle', label:'Статус-кво', hint:'Без перемен', effect:{ gdp:+0.0, exp:+0.0, cpi:+0.0 }, tags:['ожидание'], history:'Стабильно.', sources:[] }
+    ]},
+    { at:8, id:'eu-energy', text:'ЕС: компенсировать энергошок — субсидии домохозяйствам или диверсификация?', choices:[
+      { id:'hh-subs', icon:'fa-solid fa-bolt', label:'Адресные субсидии', hint:'Смягчаем удар', effect:{ gdp:+0.2, exp:+0.0, cpi:-0.1 }, tags:['субсидии'], history:'Адресная поддержка сглаживает ценовой шок.', sources:[] },
+      { id:'lng-deals', icon:'fa-solid fa-ship', label:'Сделки по СПГ', hint:'Устойчивость цепей', effect:{ gdp:+0.3, exp:+0.2, cpi:+0.0 }, tags:['энергия','переговоры'], history:'Контракты на СПГ снижают зависимость и волатильность.', sources:[] },
+      { id:'market', icon:'fa-solid fa-chart-line', label:'Рыночные механизмы', hint:'Менее популярно', effect:{ gdp:+0.1, exp:+0.1, cpi:+0.0 }, tags:['открытость'], history:'Дольше, но устойчиво.', sources:[] }
+    ]},
+    { at:13, id:'eu-air', text:'ЕС: урегулировать спор по авиапрому?', choices:[
+      { id:'coframe', icon:'fa-solid fa-scale-balanced', label:'Кооперативная рамка', hint:'Заморозка тарифов', effect:{ gdp:+0.4, exp:+0.5, cpi:+0.0 }, tags:['переговоры'], history:'Соглашение 2021 приостановило тарифы на 5 лет.', sources:[] },
+      { id:'retal-eu', icon:'fa-solid fa-hammer', label:'Ответные тарифы', hint:'Рост издержек', effect:{ gdp:-0.3, exp:-0.5, cpi:+0.1 }, tags:['тарифы'], history:'Эскалация повышает издержки.', sources:[] },
+      { id:'court-eu', icon:'fa-solid fa-gavel', label:'Судиться', hint:'Долгий трек', effect:{ gdp:+0.0, exp:+0.1, cpi:+0.0 }, tags:['право'], history:'Долго и неопределённо.', sources:[] }
+    ]}
+  ],
+  DEV: [
+    { at:2, id:'dev-fta', text:'Развивающаяся: FTA/хабовая стратегия или локализация?', choices:[
+      { id:'hub', icon:'fa-solid fa-diagram-project', label:'Стать хабом', hint:'Экспорт ↑', effect:{ gdp:+0.6, exp:+1.0, cpi:+0.0 }, tags:['открытость','хабы'], history:'Хабы выигрывают от логистики и доступа к рынкам.', sources:[] },
+      { id:'localize', icon:'fa-solid fa-gears', label:'Локализация', hint:'Риск дефицитов', effect:{ gdp:+0.2, exp:-0.4, cpi:+0.2 }, tags:['индустрия'], history:'Без FTA — выше барьеры/издержки.', sources:[] },
+      { id:'mix', icon:'fa-solid fa-scale-balanced', label:'Смешанная стратегия', hint:'Баланс', effect:{ gdp:+0.4, exp:+0.3, cpi:+0.1 }, tags:['устойчивость'], history:'Комбинация снижает риски.', sources:[] }
+    ]},
+    { at:7, id:'dev-fin', text:'Развивающаяся: как снизить риск вторичных санкций?', choices:[
+      { id:'de-risk', icon:'fa-solid fa-shield', label:'Де-рискинг каналов', hint:'Риски ниже', effect:{ gdp:+0.2, exp:+0.2, cpi:+0.0 }, tags:['переговоры','комплаенс'], history:'Реструктуризация каналов снижает вторичные риски.', sources:[] },
+      { id:'altpay', icon:'fa-solid fa-yen-sign', label:'Альтернативные расчёты', hint:'Доступ к рынкам', effect:{ gdp:+0.2, exp:+0.3, cpi:+0.0 }, tags:['платежи'], history:'Расширение каналов поддерживает торговлю.', sources:[] },
+      { id:'ignore', icon:'fa-solid fa-ban', label:'Игнорировать', hint:'Высокий риск', effect:{ gdp:-0.4, exp:-0.6, cpi:+0.2 }, tags:['эскалация'], history:'Рост санкционного давления и потеря рынков.', sources:[] }
+    ]},
+    { at:12, id:'dev-agri', text:'Развивающаяся: продовольственный шок — что делаем?', choices:[
+      { id:'export-ban', icon:'fa-solid fa-wheat-awn', label:'Запрет экспорта', hint:'Домашние цены ↓', effect:{ gdp:-0.2, exp:-1.0, cpi:-0.2 }, tags:['экспорт-контроль'], history:'Домашние цены ниже, но экспорт рушится.', sources:[] },
+      { id:'targeted', icon:'fa-solid fa-basket-shopping', label:'Адресная поддержка', hint:'Без глобального шока', effect:{ gdp:+0.1, exp:+0.0, cpi:-0.1 }, tags:['субсидии'], history:'Эффективнее, чем запреты.', sources:[] },
+      { id:'import-cut', icon:'fa-solid fa-door-open', label:'Снизить импортные тарифы', hint:'Смягчаем цены', effect:{ gdp:+0.1, exp:+0.1, cpi:-0.1 }, tags:['открытость'], history:'Понижение тарифов охлаждает цены.', sources:[] }
+    ]}
+  ],
+};
+/* =======================================================================================
+   BUILD DECK
+   ======================================================================================= */
+function buildScenarioDeck(c){
+  const base = deepCopy(scenariosBase);
+  const inserts = countryInserts[c]||[];
+  inserts.forEach(ins=>{
+    const idx = Math.min(Math.max(ins.at,0), base.length-1);
+    base[idx] = ins; // подменяем шаг для уникальности страны
+  });
+  return base;
+}
+/* =======================================================================================
+   UI REFS
+   ======================================================================================= */
+const el = {
+  start: $('#screenStart'), sim: $('#screenSim'), result: $('#screenResult'),
+  btnStart: $('#btnStart'), btnReportFromStart: $('#btnReportFromStart'),
+  selCountry: $('#selCountry'), selMode: $('#selMode'), countryNote: $('#countryNote'),
+  lblCountry: $('#lblCountry'), lblMode: $('#lblMode'),
+  lblStep: $('#lblStep'), lblTotal: $('#lblTotal'), bar: $('#bar'),
+  scenarioText: $('#scenarioText'), choices: $('#choices'), btnNext: $('#btnNext'),
+  pvGdp: $('#pvGdp'), pvGdpDelta: $('#pvGdpDelta'), pvExp: $('#pvExp'), pvExpDelta: $('#pvExpDelta'),
+  pvCpi: $('#pvCpi'), pvCpiDelta: $('#pvCpiDelta'), historyBox: $('#historyBox'), turnSummary: $('#turnSummary'),
+  fogMask: $('#fogMask'),
+  outGdp: $('#outGdp'), outExp: $('#outExp'), outCpi: $('#outCpi'), outTrust: $('#outTrust'),
+  btnCsv: $('#btnCsv'), btnAgain: $('#btnAgain'), btnPdf: $('#btnPdf'),
+};
+/* influence note (один выбор страны — без дублей) */
+function renderCountryNote(){ el.countryNote.textContent = notesByCountry[el.selCountry.value] || '—'; }
+/* =======================================================================================
+   CHARTS
+   ======================================================================================= */
+let mainChart = null; let finalChart = null; let trustChart = null;
+function buildMainChart(){
+  const ctx = document.querySelector('#chart').getContext('2d');
+  if (mainChart) mainChart.destroy();
+  mainChart = new Chart(ctx,{
+    type:'line',
+    data:{
+      labels: months,
+      datasets:[
+        { label:'ВВП (индекс)', data: timeline.map(p=>p.gdpIdx), yAxisID:'y', borderWidth:2, tension:.25, fill:false, borderColor:'#22c55e' },
+        { label:'Экспорт (индекс)', data: timeline.map(p=>p.expIdx), yAxisID:'y', borderWidth:2, tension:.25, fill:false, borderColor:'#60a5fa' },
+        { label:'Инфляция (%)', data: timeline.map(p=>p.cpi), yAxisID:'y1', borderWidth:2, tension:.25, fill:false, borderColor:'#f59e0b' }
+      ]
+    },
+    options:{
+      responsive: true,
+      maintainAspectRatio: false, // <-- важно для авто-высоты по --chart-h
+      animation:{ duration:700, easing:'easeInOutCubic' },
+      elements: { point: { radius: 2 } },
+      plugins:{ legend:{ labels:{ color:getComputedStyle(document.body).getPropertyValue('--muted') } } },
+      scales:{
+        x:{ ticks:{ color:getComputedStyle(document.body).getPropertyValue('--muted'), maxRotation:0 }, 
+            grid:{ color:getComputedStyle(document.body).getPropertyValue('--line') } },
+        y:{ ticks:{ color:getComputedStyle(document.body).getPropertyValue('--muted') }, 
+            grid:{ color:getComputedStyle(document.body).getPropertyValue('--line') }, 
+            title:{ display:true, text:'индексы = 100' } },
+        y1:{ position:'right', ticks:{ color:getComputedStyle(document.body).getPropertyValue('--muted') }, 
+             grid:{ drawOnChartArea:false }, title:{ display:true, text:'инфляция, %' } }
+      }
+    }
+  });
+}
+
+function updateMainChart(){
+  if(!mainChart) return;
+  mainChart.data.labels = timeline.map((_,i)=>i);
+  mainChart.data.datasets[0].data = timeline.map(p=>p.gdpIdx);
+  mainChart.data.datasets[1].data = timeline.map(p=>p.expIdx);
+  mainChart.data.datasets[2].data = timeline.map(p=>p.cpi);
+  mainChart.update();
+}
+/* =======================================================================================
+   PREVIEW / HISTORY
+   ======================================================================================= */
+function setPreview(eff){
+  if(mode==='FOG'){
+    el.fogMask.style.display='block';
+    el.pvGdp.textContent = fmt(state.gdpIdx);
+    el.pvExp.textContent = fmt(state.expIdx);
+    el.pvCpi.textContent = fmt(state.cpi)+'%';
+    el.pvGdpDelta.textContent = el.pvExpDelta.textContent = el.pvCpiDelta.textContent = 'скрыто';
+    el.pvGdpDelta.className = el.pvExpDelta.className = el.pvCpiDelta.className = 'delta';
+    return;
+  }
+  el.fogMask.style.display='none';
+  const pv = calcPreview(eff);
+  el.pvGdp.textContent = fmt(pv.gdpIdx);
+  el.pvExp.textContent = fmt(pv.expIdx);
+  el.pvCpi.textContent = fmt(pv.cpi)+'%';
+  const dG = pv.gdpIdx - state.gdpIdx, dE = pv.expIdx - state.expIdx, dC = pv.cpi - state.cpi;
+  el.pvGdpDelta.textContent = (dG===0?'—':(dG>0?'+':'')+fmt(dG));
+  el.pvGdpDelta.className = 'delta ' + (dG>0?'pos':(dG<0?'neg':''));
+  el.pvExpDelta.textContent = (dE===0?'—':(dE>0?'+':'')+fmt(dE));
+  el.pvExpDelta.className = 'delta ' + (dE>0?'pos':(dE<0?'neg':''));
+  el.pvCpiDelta.textContent = (dC===0?'—':(dC>0?'+':'')+fmt(dC))+' п.п.';
+  el.pvCpiDelta.className = 'delta ' + (dC<0?'pos':(dC>0?'neg':''));
+}
+function calcPreview(eff){
+  const mods = countryMods[country] || countryMods.USA;
+  let g = eff.gdp, e = eff.exp, c = eff.cpi;
+  const tags = eff._tags||[];
+  if(country==='USA'){
+    if(tags.includes('санкции')||tags.includes('техконтроль')){ g*=mods.sanctions; }
+    if(tags.includes('тарифы')){ e*=mods.tariffExp; }
+    if(tags.includes('чипы')){ g*=mods.tech; }
+    e*=mods.exp; c*=mods.cpi; g*=mods.gdp;
+  }
+  if(country==='CHN'){
+    if(tags.includes('диверсификация')||tags.includes('хабы')) e*=mods.diversify;
+    if(tags.includes('логистика')) g*=mods.logistics;
+    e*=mods.exp; c*=mods.cpi; g*=mods.gdp;
+  }
+  if(country==='EU'){
+    if(tags.includes('переговоры')) g*=mods.talks;
+    if(tags.includes('энергия')) c*=mods.energy;
+    c*=mods.cpi; g*=mods.gdp; e*=mods.exp;
+  }
+  if(country==='DEV' && mods.riskHigh){
+    const mult = g>0 ? mods.success : mods.fail;
+    g*=mult; e*=1.10; c*=1.10;
+  }
+  const ev = stepRandom[stepIndex];
+  if(ev && ev.choiceId === eff._choiceId){
+    let scale = 1.0;
+    if(mode==='HARD') scale = 1.25; // в hard события сильнее
+    g += ev.ev.gdp*scale; e += ev.ev.exp*scale; c += ev.ev.cpi*scale;
+  }
+  return {
+    gdpIdx: clamp(state.gdpIdx + g, 60, 160),
+    expIdx: clamp(state.expIdx + e, 60, 160),
+    cpi: clamp(state.cpi + c, 0.0, 25.0),
+  };
+}
+function renderHistory(choice){
+  const box = el.historyBox; box.innerHTML = '';
+  if(!choice){
+    box.innerHTML = `<div class="fact"><div class="small">Нажми на вариант — покажем пример из истории: «что сделали → к чему привело».</div></div>`;
+    return;
+  }
+  const ev = stepRandom[stepIndex];
+  if(ev && ev.choiceId===choice.id){
+    const g=ev.ev.gdp, e=ev.ev.exp, c=ev.ev.cpi;
+    box.innerHTML += `<div class="fact"><div class="small"><b>Случайное событие</b>: ${ev.ev.text}. Влияние: ВВП ${(g>0?'+':'')+fmt(g)}, Экспорт ${(e>0?'+':'')+fmt(e)}, Инфляция ${(c>0?'+':'')+fmt(c)} п.п.</div></div>`;
+  }
+  const src = (choice.sources||[]).map(s=>`<a target="_blank" rel="noopener" href="${s.url}">${s.label}</a>`).join(' · ');
+  box.innerHTML += `<div class="fact"><div class="small"><b>Историческая справка:</b> ${choice.history}</div></div>` + (src? `<div class="fact"><div class="small"><b>Источники:</b> ${src}</div></div>` : '');
+}
+/* =======================================================================================
+   SELECT/APPLY
+   ======================================================================================= */
+let scenarios = buildScenarioDeck(country);
+function effectOf(choice){ const eff = deepCopy(choice.effect); eff._tags = choice.tags||[]; eff._choiceId = choice.id; return eff; }
+function onSelectChoice(choice){
+  if(!stepRandom[stepIndex]){ const ev = deepCopy(randomPool[Math.floor(Math.random()*randomPool.length)]); stepRandom[stepIndex] = { choiceId: choice.id, ev }; }
+  selections[stepIndex] = { choiceId: choice.id, applied:false };
+  renderChoices(); setPreview(effectOf(choice)); renderHistory(choice);
+  el.btnNext.disabled = false;
+  el.btnNext.disabled = false;
+el.btnNext.removeAttribute('disabled'); // на всякий случай синхронизируем атрибут
+
+  el.turnSummary.innerHTML = `Вы выбрали: <b>${choice.label}</b>. Изучи историческую справку. Изменения вступят в силу после «Далее».`;
+}
+function applyStep(){
+  const curr = scenarios[stepIndex];
+  const sel = selections[stepIndex]; if(!sel){ toast('Сначала выбери действие'); return; }
+  if(sel.applied){ gotoStep(stepIndex+1); return; }
+  const choice = curr.choices.find(c=>c.id===sel.choiceId);
+  const eff = effectOf(choice);
+  const after = calcPreview(eff);
+  const prev = deepCopy(state);
+  state = deepCopy(after);
+  timeline.push({...state});
+  months.push((months[months.length-1]||0)+3);
+  const attached = stepRandom[stepIndex] && stepRandom[stepIndex].choiceId===choice.id ? stepRandom[stepIndex].ev : null;
+  resultsLog.push({
+    step: stepIndex+1,
+    scenario: curr.text,
+    choice: choice.label,
+    delta: { gdp: fmt(after.gdpIdx - prev.gdpIdx), exp: fmt(after.expIdx - prev.expIdx), cpi: fmt(after.cpi - prev.cpi) },
+    tags: (choice.tags||[]).join(', '),
+    random_event: attached ? `${attached.text} (gdp ${fmt(attached.gdp)}, exp ${fmt(attached.exp)}, cpi ${fmt(attached.cpi)})` : '',
+    sources: (choice.sources||[]).map(h=>`${h.label}`).join(' | '),
+    history: choice.history || '—'
+  });
+  selections[stepIndex].applied = true;
+  updateProgress();
+  if(!mainChart) buildMainChart(); else updateMainChart();
+  el.turnSummary.innerHTML = `Ход <b>${stepIndex+1}</b> применён: <b>${choice.label}</b>. ВВП: <b>${fmt(state.gdpIdx)}</b>, Экспорт: <b>${fmt(state.expIdx)}</b>, Инфляция: <b>${fmt(state.cpi)}</b>%.`;
+  gotoStep(stepIndex+1);
+}
+/* =======================================================================================
+   PROGRESS / RENDER
+   ======================================================================================= */
+function updateProgress(){ const perc = (stepIndex / stepsTotal) * 100; el.bar.style.width = `${perc}%`; el.lblStep.textContent = Math.min(stepIndex+1, stepsTotal); }
+function gotoStep(i){ if(i>=stepsTotal){ showResult(); return; } stepIndex = i; updateProgress(); renderChoices(); }
+function renderChoices(){
+  const curr = scenarios[stepIndex];
+  el.scenarioText.textContent = curr.text;
+  el.choices.innerHTML = '';
+  curr.choices.forEach(ch=>{
+    const node = document.createElement('div');
+    node.className = 'choice';
+    const selected = selections[stepIndex] && selections[stepIndex].choiceId===ch.id;
+    if(selected) node.classList.add('selected');
+    node.innerHTML = `
+      <div class="icon"><i class="${ch.icon}"></i></div>
+      <div class="body">
+        <div class="title">${ch.label}</div>
+        <div class="hint">${ch.hint}</div>
+        <div class="small">Теги: ${(ch.tags||[]).map(t=>`<span class="pill" style="padding:2px 8px;font-size:11px">${t}</span>`).join(' ')}</div>
+      </div>`;
+    node.addEventListener('click',()=>onSelectChoice(ch));
+    el.choices.appendChild(node);
+  });
+  const sel = selections[stepIndex];
+  if(!sel){ setPreview({gdp:0,exp:0,cpi:0,_choiceId:null,_tags:[]}); renderHistory(null); el.btnNext.disabled = true; }
+}
+/* =======================================================================================
+   RESULT / TRUST / ANALYSIS
+   ======================================================================================= */
+function showResult(){
+  el.start.classList.remove('active'); el.sim.classList.remove('active'); el.result.classList.add('active');
+  el.outGdp.textContent = fmt(state.gdpIdx);
+  el.outExp.textContent = fmt(state.expIdx);
+  el.outCpi.textContent = fmt(state.cpi)+'%';
+  const trust = computeTrust();
+  el.outTrust.textContent = fmt(trust)+' / 100';
+  drawTrust(trust);
+  $('#trustNote').textContent = trustExplain(trust);
+  const analysis = buildAnalysis(trust);
+  $('#resultText').innerHTML = analysis.html;
+  const moves = resultsLog.map(r=>
+    `<div style="margin:0 0 10px">
+      <b>Ход ${r.step}.</b> <i>${r.scenario}</i><br/>
+      Выбор: <b>${r.choice}</b> <span class="small muted">[${r.tags}]</span><br/>
+      ΔВВП: ${r.delta.gdp}, ΔЭкспорт: ${r.delta.exp}, ΔИнфляция: ${r.delta.cpi} п.п.<br/>
+      Исторический пример: <span class="small">${r.history}</span><br/>
+      Событие: <span class="small">${r.random_event || '—'}</span><br/>
+      Источники: <span class="small">${r.sources}</span>
+     </div>`
+  ).join('');
+  $('#movesLog').innerHTML = moves || '<div class="small">Лог пуст.</div>';
+  const ctx = $('#finalChart').getContext('2d');
+  if(finalChart) finalChart.destroy();
+  finalChart = new Chart(ctx,{
+    type:'line',
+    data:{
+      labels: months,
+      datasets:[
+        { label:'ВВП (индекс)', data: timeline.map(p=>p.gdpIdx), borderColor:'#22c55e', tension:.35 },
+        { label:'Экспорт (индекс)', data: timeline.map(p=>p.expIdx), borderColor:'#60a5fa', tension:.35 },
+        { label:'Инфляция (%)', data: timeline.map(p=>p.cpi), borderColor:'#f59e0b', tension:.35, yAxisID:'y1' },
+      ]
+    },
+    options:{
+      animation:{ duration:800 },
+      plugins:{ legend:{ labels:{ color:getComputedStyle(document.body).getPropertyValue('--muted') } } },
+      scales:{
+        x:{ ticks:{ color:getComputedStyle(document.body).getPropertyValue('--muted') }, grid:{ color:getComputedStyle(document.body).getPropertyValue('--line') }, title:{display:true,text:'внутренняя шкала, месяцы'} },
+        y:{ ticks:{ color:getComputedStyle(document.body).getPropertyValue('--muted') }, grid:{ color:getComputedStyle(document.body).getPropertyValue('--line') }, title:{ display:true, text:'индексы = 100' } },
+        y1:{ position:'right', ticks:{ color:getComputedStyle(document.body).getPropertyValue('--muted') }, grid:{ drawOnChartArea:false }, title:{ display:true, text:'инфляция, %' } }
+      }
+    }
+  });
+}
+function computeTrust(){
+  let t = 50;
+  const weights = { 'переговоры': +8, 'право': +7, 'открытость': +7, 'диверсификация': +6, 'устойчивость': +5, 'субсидии': +2,
+                    'санкции': -6, 'техконтроль': -5, 'эскалация': -8, 'квоты': -6, 'safeguard': -5, 'протекционизм': -7, 'экспорт-контроль': -5, 'тарифы': -4 };
+  resultsLog.forEach(r=>{
+    (r.tags||'').split(',').map(s=>s.trim()).filter(Boolean).forEach(tag=>{ if(weights[tag]!==undefined) t += weights[tag]; });
+  });
+  const infPenalty = Math.max(0, state.cpi - 3.0) * 0.8; t -= infPenalty;
+  if(mode==='HARD') t -= 2; // немного ниже доверие из-за более жёсткой траектории
+  return clamp(Math.round(t), 0, 100);
+}
+function trustExplain(t){
+  if(t>=75) return 'Высокое доверие: предсказуемая, кооперационная политика';
+  if(t>=55) return 'Умеренное доверие: баланс между защитой и сотрудничеством.';
+  if(t>=35) return 'Низкое доверие: заметно больше протекционизма/санкций.';
+  return 'Очень низкое доверие: доминировали эскалация и барьеры.';
+}
+function drawTrust(value){
+  const ctx = $('#trustChart').getContext('2d');
+  if(trustChart) trustChart.destroy();
+  trustChart = new Chart(ctx,{ type:'doughnut',
+    data:{ labels:['Доверие','Остальное'], datasets:[{ data:[value, 100-value], backgroundColor:['#22c55e', getComputedStyle(document.body).getPropertyValue('--line')], borderWidth:0 }] },
+    options:{ cutout:'70%', plugins:{ legend:{ display:false }, tooltip:{ enabled:false } }, animation:{ duration:700 } }
+  });
+}
+function buildAnalysis(trust){
+  const gainG = state.gdpIdx-100, gainE = state.expIdx-100, gainC = state.cpi-2;
+  const score = gainG + gainE - 2*gainC;
+  let verdict = 'Нейтрально: баланс между защитой и ростом.';
+  if(score>6) verdict = 'Сильный результат: дипломатия/диверсификация дали устойчивый рост.';
+  if(score<-6) verdict = 'Слабый результат: эскалация/барьеры перевесили выгоды.';
+  const tags = resultsLog.flatMap(r => (r.tags||'').split(',').map(s=>s.trim()).filter(Boolean));
+  const countBy = (t) => tags.filter(x=>x===t).length;
+  const strengths = []; if(countBy('диверсификация')>0) strengths.push('Диверсификация снижала уязвимость цепочек и поддерживала экспорт.'); if(countBy('переговоры')>0) strengths.push('Переговоры уменьшали неопределённость и улучшали ожидания.');
+  const weaknesses = []; if(countBy('тарифы')>0) weaknesses.push('«Тотальные» тарифы → рост издержек входов и ответные меры.'); if(countBy('санкции')>0) weaknesses.push('Жёсткие санкции сокращают экспорт и фрагментируют расчёты.'); if(countBy('safeguard')>0) weaknesses.push('Защитные квоты стабилизируют отрасль ценой дефицитов/цен.');
+  const tips = []; if(gainC>0.3) tips.push('Инфляция росла — полезнее таргетированные меры вместо тотальных тарифов.'); if(gainE<0) tips.push('Экспорт проседал — усиливай FTA/хабовую стратегию и логистику.'); if(gainG<0) tips.push('ВВП снижался — увеличь долю кооперационных/инвест-решений.'); if(trust<55) tips.push('Доверие низкое — смести фокус к переговорам/правовым трекам и транспарентным правилам.');
+  const html = `
+    <b>Вердикт:</b> ${verdict}<br/>
+    <b>Счёт</b> = (ВВП−100) + (Экспорт−100) − 2×(Инфляция−2) = <b>${fmt(score,2)}</b>.<br/>
+    <b>Индекс доверия партнёров:</b> <b>${fmt(trust)}</b>/100 — ${trustExplain(trust)}<br/>
+    <hr style="border-color:var(--line);margin:8px 0"/>
+    <b>Сильные стороны:</b> ${strengths.length? strengths.join(' '): '—'}<br/>
+    <b>Слепые зоны:</b> ${weaknesses.length? weaknesses.join(' '): '—'}<br/>
+    <b>Рекомендации:</b> ${tips.length? tips.join(' '): 'Поддерживай переговоры и диверсификацию; избегай тотальных барьеров без форс-обстоятельств.'}
+  `;
+  return { html };
+}
+/* =======================================================================================
+   EXPORT (CSV/PDF)
+   ======================================================================================= */
+function csvEscape(s){ const str=(s??'').toString(); return /[",\n]/.test(str)? `"${str.replace(/"/g,'""')}"`: str; }
+function downloadCSV(){
+  const header = ['step','scenario','choice','delta_gdp','delta_exp','delta_cpi','tags','random_event','sources','history'];
+  const rows = resultsLog.map(r=>[ r.step, csvEscape(r.scenario), csvEscape(r.choice), r.delta.gdp, r.delta.exp, r.delta.cpi, csvEscape(r.tags), csvEscape(r.random_event), csvEscape(r.sources), csvEscape(r.history) ]);
+  const csv = [header.join(','), ...rows.map(r=>r.join(','))].join('\n');
+  const blob = new Blob([csv],{type:'text/csv;charset=utf-8;'}); const name = 'trade_sim_results.csv';
+  if(window.saveAs){ saveAs(blob, name); } else { const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=name; a.click(); URL.revokeObjectURL(a.href); }
+  toast('CSV сформирован');
+}
+async function downloadPDF(){
+  const { jsPDF } = window.jspdf;
+  const node = document.getElementById('resultToPrint');
+  if(finalChart) finalChart.update(); if(trustChart) trustChart.update();
+  const canvas = await html2canvas(node, { scale:2, backgroundColor:null, useCORS:true });
+  const pdf = new jsPDF({ unit:'pt', format:'a4', compress:true });
+  const pageW = pdf.internal.pageSize.getWidth(), pageH = pdf.internal.pageSize.getHeight();
+  const imgW = pageW - 60; const imgH = canvas.height * (imgW/canvas.width);
+  let remaining = imgH, sY = 0;
+  while(remaining > 0){
+    const sliceHeight = Math.min(remaining, pageH - 60);
+    const pageCanvas = document.createElement('canvas'); pageCanvas.width = canvas.width; pageCanvas.height = sliceHeight * (canvas.width/imgW);
+    pageCanvas.getContext('2d').drawImage(canvas, 0, sY*(canvas.width/imgW), canvas.width, pageCanvas.height, 0, 0, canvas.width, pageCanvas.height);
+    pdf.addImage(pageCanvas.toDataURL('image/png'), 'PNG', 30, 30, imgW, sliceHeight, undefined,'FAST');
+    remaining -= sliceHeight; sY += sliceHeight; if(remaining>0) pdf.addPage();
+  }
+  pdf.save('trade_sim_report.pdf'); toast('PDF сформирован');
+}
+/* =======================================================================================
+   RESET / BINDINGS
+   ======================================================================================= */
+function updateFogUI(){ el.fogMask.style.display = (mode==='FOG'?'block':'none'); }
+function showStart(){ el.start.classList.add('active'); el.sim.classList.remove('active'); el.result.classList.remove('active'); }
+function showSim(){
+  el.start.classList.remove('active'); el.sim.classList.add('active'); el.result.classList.remove('active');
+  el.lblCountry.textContent = notesByCountry[country] || country;
+  el.lblMode.textContent = (mode==='NORMAL'?'Нормальный': mode==='HARD'?'Тяжелый':'Слепой');
+  updateFogUI();
+  updateProgress(); renderChoices(); buildMainChart();
+  el.turnSummary.textContent = 'Графики меняются только после «Далее». Сначала — превью и историческая аналогия.';
+}
+function resetAll(toStart=true){
+  stepIndex=0; stepsTotal=12;
+  state=deepCopy(baseState); timeline=[{...state}]; months=[0];
+  selections=Array(stepsTotal).fill(null); stepRandom=Array(stepsTotal).fill(null); resultsLog=[];
+  scenarios = buildScenarioDeck(country);
+  el.lblTotal.textContent = stepsTotal; updateProgress();
+  if(mainChart){ mainChart.destroy(); mainChart=null; }
+  if(toStart){ showStart(); renderCountryNote(); }
+}
+/* bindings */
+el.selCountry.addEventListener('change', renderCountryNote);
+el.selMode.addEventListener('change', ()=>{ mode = el.selMode.value; updateFogUI(); });
+el.btnStart.addEventListener('click', ()=>{
+  country = el.selCountry.value; mode = el.selMode.value;
+  resetAll(false); showSim();
+});
+el.btnReportFromStart.addEventListener('click', ()=>{ if(!el.btnReportFromStart.disabled){ showResult(); } });
+el.btnNext.addEventListener('click', applyStep);
+el.btnCsv.addEventListener('click', downloadCSV);
+el.btnPdf.addEventListener('click', downloadPDF);
+el.btnAgain.addEventListener('click', ()=>{ showStart(); resetAll(true); el.btnReportFromStart.disabled=true; });
+/* завершение запуска */
+renderCountryNote();
+el.lblTotal.textContent = stepsTotal;
+toast('Готово. Выбери страну и режим, затем «Начать игру».');
+
+// --- Ensure single-tap activation for Next button on touch devices ---
+(function ensureNextSingleTap(){
+  const btn = document.getElementById('btnNext');
+  if (!btn) return;
+  // prevent double-tap zoom issues on iOS
+  btn.addEventListener('touchend', function(e){ e.preventDefault(); btn.click(); }, {passive:false});
+})();
+
+
+/*
+  === Пасхалка r6tr0 / amir ===
+  Активация (в коде, чтобы игрок сам не догадался):
+  — Desktop: удерживай Shift и нажми "E", затем набери по буквам r6tr0 (нечувствительно к регистру).
+  — Mobile: сделай 3 быстрых тапа по левому логотипу, затем долгий тап 800мс.
+  Подсказки для теста разработчика оставлены в комментариях.
+*/
+(function eggInit(){
+  const mask = document.getElementById('eggMask');
+  const close = document.getElementById('eggClose');
+  const logo = document.querySelector('.brand'); // левый логотип/заголовок
+  function openEgg(){ mask.style.display='grid'; }
+  function closeEgg(){ mask.style.display='none'; }
+  close.addEventListener('click', closeEgg);
+
+  // Desktop combo: Shift+E then type r6tr0
+  let armed = false, buffer = '';
+  window.addEventListener('keydown', (e)=>{
+    if (e.key.toLowerCase()==='e' && e.shiftKey){ armed = true; buffer=''; }
+    else if (armed){
+      buffer += e.key.toLowerCase();
+      if (!'r6tr0'.startsWith(buffer)) { armed=false; buffer=''; }
+      else if (buffer==='r6tr0'){ openEgg(); armed=false; buffer=''; }
+    }
+  });
+
+  // Mobile: triple-tap then long-press
+  let taps = 0, lastTap = 0, pressTimer=null;
+  function onTap(){
+    const now = Date.now();
+    if (now - lastTap < 400) taps++; else taps=1;
+    lastTap = now;
+    if (taps>=3){
+      // ждём долгого удержания
+      if (pressTimer) clearTimeout(pressTimer);
+      logo.addEventListener('touchstart', ()=>{
+        pressTimer = setTimeout(openEgg, 800);
+      }, {once:true});
+      logo.addEventListener('touchend', ()=>{ if (pressTimer) clearTimeout(pressTimer); }, {once:true});
+    }
+  }
+  if (logo){
+    logo.addEventListener('click', onTap);
+    logo.addEventListener('touchend', (e)=>{ e.preventDefault(); onTap(); }, {passive:false});
+  }
+})();
+
+
+// Adjust chart heights for device
+(function adjustChartHeights(){
+  const isMobile = window.matchMedia('(max-width: 768px)').matches;
+  document.documentElement.setAttribute('data-device', isMobile ? 'mobile' : 'desktop');
+  const h = isMobile ? '240px' : '360px';
+  document.documentElement.style.setProperty('--chart-h', h);
+})();
+
+</script>
+<!-- === ЗАХОД 2/3: РАСШИРЕНИЕ ИГРЫ (вставить ЭТОТ <script> ПОСЛЕ первого и ПЕРЕД </body>) === -->
+<script id="pack2">
+// ================================================================
+// SIM EXTENSION PACK v2 — сложные режимы, усиленные страны,
+// образовательные справки, доверие по времени, +новые сценарии
+// Инсталляция: ВСТАВИТЬ ЭТОТ <script> СРАЗУ ПОСЛЕ основного
+// <script> в твоём файле, перед закрывающим </body>.
+// Код не дублирует базовые переменные — он расширяет их.
+// ================================================================
+(function(){
+  // Безопасные проверки наличия базового движка
+  if(typeof window === 'undefined' || !document || !window.countryMods){
+    console.error('[Pack2] Базовый движок не найден. Убедись, что этот скрипт подключён ПОСЛЕ первого.');
+    return;
+  }
+  // ------------------------------------------------
+  // ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ ДОПОЛНЕНИЯ
+  // ------------------------------------------------
+  window.gameMode = window.gameMode || 'normal'; // 'normal' | 'hard' | 'fog'
+  window.trustTimeline = window.trustTimeline || [50]; // старт совпадает с базой computeTrust
+  window.pack2Notes = []; // журнал заметок расширений (для отчёта)
+  // Для совместимости: если в первой версии stepsTotal = 12, делаем 12
+  const __oldResetAll = window.resetAll;
+  window.resetAll = function(toStart=true){
+    __oldResetAll(toStart);
+    try{
+      stepsTotal = 12; // 15 ходов как просили
+      selections = Array(stepsTotal).fill(null);
+      stepRandom = Array(stepsTotal).fill(null);
+      el.lblTotal.textContent = stepsTotal;
+      trustTimeline = [50];
+      // Чуть более явное влияние страны: доп. подсказка на старте симуляции
+      if(!toStart){
+        setTimeout(()=>{
+          toast('Механики страны усилены. См. карточки влияния.');
+        }, 300);
+      }
+    }catch(err){ console.warn('[Pack2] resetAll patch warn:', err); }
+  };
+  // Добавим селектор режима на стартовый экран
+  function injectModeSelector(){
+    try{
+      const start = document.querySelector('#screenStart .card.hero.pad');
+      if(!start || document.getElementById('modePanel')) return;
+      const panel = document.createElement('div');
+      panel.className = 'panel';
+      panel.id = 'modePanel';
+      panel.innerHTML = `
+        <h3 style="margin-top:0"><i class="fa-solid fa-gamepad"></i> Режим сложности</h3>
+        <div class="choices" role="group" aria-label="Режим сложности">
+          <label class="choice" style="align-items:center">
+            <input type="radio" name="mode" value="normal" checked style="margin-right:10px"/>
+            <div class="body"><div class="title">Обычный</div><div class="hint">Прозрачный превью эффектов, базовая волатильность.</div></div>
+          </label>
+          <label class="choice" style="align-items:center">
+            <input type="radio" name="mode" value="hard" style="margin-right:10px"/>
+            <div class="body"><div class="title">Сложный</div><div class="hint">Выше волатильность и риск негативных событий.</div></div>
+          </label>
+          <label class="choice" style="align-items:center">
+            <input type="radio" name="mode" value="fog" style="margin-right:10px"/>
+            <div class="body"><div class="title">Туман войны</div><div class="hint">Превью эффектов скрыто до «Далее».</div></div>
+          </label>
+        </div>`;
+      // вставим до правой панели выбора страны
+      const grid = start.querySelector('.grid.cols-2');
+      const left = grid?.children?.[0];
+      if(left){ left.appendChild(panel); }
+      // добавим 4-й пункт на стартовом экране (как просили)
+      const three = start.querySelector('.grid.cols-3');
+      if(three){
+        const step4 = document.createElement('div');
+        step4.className = 'panel';
+        step4.innerHTML = `<div class="small muted">4</div><b>Изучи результаты и скачай отчёт</b><div class="note">В конце — резюме, индекс доверия партнёров и PDF/CSV.</div>`;
+        three.appendChild(step4);
+      }
+      // биндинг радиокнопок
+      panel.querySelectorAll('input[name="mode"]').forEach(r=>{
+        r.addEventListener('change', (e)=>{
+          gameMode = e.target.value;
+          toast(gameMode==='normal'?'Режим: обычный': gameMode==='hard'?'Режим: сложный':'Режим: туман войны');
+        });
+      });
+    }catch(err){ console.warn('[Pack2] injectModeSelector warn:', err); }
+  }
+  injectModeSelector();
+  // ------------------------------------------------
+  // СЛУЧАЙНЫЕ СОБЫТИЯ: расширение пула + взвешенный выбор
+  // ------------------------------------------------
+  // Дополняем пул 10+ новыми событиями для вариативности
+  try{
+    window.randomPool.push(
+      { key:'strike', text:'Забастовка в логистике: задержки в портах', gdp:-0.5, exp:-0.9, cpi:+0.2 },
+      { key:'fta-mini', text:'Мини-FTA с нишевым рынком', gdp:+0.4, exp:+0.7, cpi:+0.0 },
+      { key:'fx-spike', text:'Скачок курса из-за оттока капитала', gdp:-0.6, exp:+0.2, cpi:+0.3 },
+      { key:'harvest', text:'Удачный урожай ключевой культуры', gdp:+0.3, exp:+0.5, cpi:-0.2 },
+      { key:'it-breach',text:'Киберинцидент у крупного экспортёра', gdp:-0.4, exp:-0.8, cpi:+0.1 },
+      { key:'tourism', text:'Всплеск туризма из‑за событий/курса', gdp:+0.5, exp:+0.2, cpi:+0.1 },
+      { key:'port-new', text:'Запуск нового терминала/логистического хаба', gdp:+0.4, exp:+0.9, cpi:-0.1 },
+      { key:'antidump', text:'Партнёр внедрил антидемпинг против нас', gdp:-0.3, exp:-0.6, cpi:+0.1 },
+      { key:'energy-dip', text:'Временное удешевление энергетики', gdp:+0.4, exp:+0.3, cpi:-0.3 },
+      { key:'credit-tight', text:'Ужесточение кредитных условий внутри', gdp:-0.5, exp:-0.2, cpi:-0.1 }
+    );
+  }catch(err){ console.warn('[Pack2] randomPool push warn:', err); }
+  function weightedPick(list, weightFn){
+    const weights = list.map(weightFn);
+    const sum = weights.reduce((a,b)=>a+b,0);
+    let r = Math.random()*sum;
+    for(let i=0;i<list.length;i++){
+      r -= weights[i];
+      if(r<=0) return list[i];
+    }
+    return list[list.length-1];
+  }
+  function pickRandomEvent(choice){
+    const tags = (choice?.tags||[]);
+    const NEG = ['эскалация','санкции','тарифы','экспорт-контроль','квоты','safeguard','протекционизм'];
+    const POS = ['переговоры','открытость','диверсификация','устойчивость','право'];
+    return weightedPick(randomPool, ev=>{
+      let w = 1;
+      if(gameMode==='hard') w *= 1.2;
+      if(gameMode==='fog') w *= 1.1;
+      // Если выбранная опция эскалационная — немного повышаем шанс негативных событий
+      if(tags.some(t=>NEG.includes(t))){
+        if(ev.gdp<0 || ev.exp<0 || ev.cpi>0) w *= 1.35; else w *= 0.8;
+      }
+      // Если кооперативная — наоборот
+      if(tags.some(t=>POS.includes(t))){
+        if(ev.gdp>0 || ev.exp>0 || ev.cpi<0) w *= 1.25; else w *= 0.85;
+      }
+      // Страновые эффекты
+      if(country==='USA' && ev.key==='ally') w *= 1.15; // союзники
+      if(country==='CHN' && ev.key==='port-new') w *= 1.2; // логистика
+      if(country==='EU' && ev.key==='energy-dip') w *= 1.25; // энергия
+      if(country==='DEV' && ev.key==='fta-mini') w *= 1.2; // хабовая удача
+      return Math.max(w, 0.05);
+    });
+  }
+  // Перехват onSelectChoice, чтобы использовать наш взвешенный выбор события
+  const __oldOnSelectChoice = window.onSelectChoice;
+  window.onSelectChoice = function(choice){
+    try{
+      if(!stepRandom[stepIndex]){
+        stepRandom[stepIndex] = { choiceId: choice.id, ev: pickRandomEvent(choice) };
+      }
+    }catch(err){ console.warn('[Pack2] onSelectChoice patch warn:', err); }
+    return __oldOnSelectChoice(choice);
+  };
+  // ------------------------------------------------
+  // СИЛЬНЕЕ ВЛИЯНИЕ СТРАНЫ: пассивные механики и особые случаи
+  // ------------------------------------------------
+  // Пассивы применяются в calcPreview, чтобы работали и в превью и в пост-эффектах
+  function applyCountryPassives(eff, after){
+    try{
+      const prev = state; // текущее до применения
+      const tags = eff? (eff._tags||[]) : [];
+      let g = after.gdpIdx - prev.gdpIdx;
+      let e = after.expIdx - prev.expIdx;
+      let c = after.cpi - prev.cpi;
+      const notes = [];
+      if(country==='USA'){
+        // «Политическая пробуксовка»: при последовательных протекционистских шагах
+        const recent = resultsLog.slice(-3).flatMap(r=> (r.tags||'').split(',').map(s=>s.trim()));
+        const prot = recent.filter(t=>['эскалация','тарифы','протекционизм','санкции'].includes(t)).length;
+        if(prot>=2 && (tags.includes('тарифы') || tags.includes('санкции'))){
+          e -= 0.2; g -= 0.1; notes.push('США: политическая инерция — сложнее проводить жёсткие меры последовательно.');
+        }
+        // «Техлидерство»: кооперация/стандарты дают доп. бонус к экспорту
+        if(tags.includes('переговоры') || tags.includes('диалог')){ e += 0.1; notes.push('США: кооперация по стандартам усиливает экспорт высокотеха.'); }
+      }
+      if(country==='CHN'){
+        // «Двойная циркуляция»: сдвиг к внутреннему спросу снижает инфляцию
+        if(tags.includes('устойчивость') || tags.includes('ожидание')){ c -= 0.05; notes.push('Китай: двойная циркуляция — ниже инфляционное давление.'); }
+        // «Логистические платформы»: диверсификация даёт сверх-бонус к экспорту
+        if(tags.includes('диверсификация') || tags.includes('хабы')){ e += 0.15; notes.push('Китай: логистическая сеть усиливает эффект диверсификации.'); }
+      }
+      if(country==='EU'){
+        // «CBAM/энергоэффективность»: при энергетических шагах инфляция меньше растёт
+        if(tags.includes('энергия')){ c -= 0.08; notes.push('ЕС: энергоэффективность/CBAM сглаживают ценовой шок.'); }
+        // «Переговорная сила»: цепочка кооперативных ходов повышает ВВП
+        const coop = resultsLog.slice(-2).flatMap(r=> (r.tags||'').split(',')).filter(t=>t.trim()==='переговоры').length;
+        if(coop>=2 && tags.includes('переговоры')){ g += 0.15; notes.push('ЕС: инерция переговоров — доверие выше, мультипликатор растёт.'); }
+      }
+      if(country==='DEV'){
+        // «Высокая волатильность»: успехи и провалы усиливаются
+        if(g>0) g *= 1.08; if(g<0) g *= 1.1; if(e>0) e *= 1.05; if(e<0) e *= 1.08; c *= 1.05;
+        notes.push('Развивающаяся: высокая волатильность усиливает эффект.');
+        // «Программа стабилизации»: если инфляция > 6 и ВВП<98 к ходу >=7 — скрытая поддержка
+        if(stepIndex>=6 && prev.cpi>6.0 && prev.gdpIdx<98){ c -= 0.15; g += 0.1; notes.push('Развивающаяся: стабилизационная программа снижает инфляцию.'); }
+      }
+      const newAfter = {
+        gdpIdx: clamp(prev.gdpIdx + g, 60, 160),
+        expIdx: clamp(prev.expIdx + e, 60, 160),
+        cpi: clamp(prev.cpi + c, 0.0, 25.0)
+      };
+      if(notes.length){ pack2Notes.push({ step: stepIndex+1, notes }); }
+      return newAfter;
+    }catch(err){ console.warn('[Pack2] passives warn:', err); return after; }
+  }
+  const __oldCalcPreview = window.calcPreview;
+  window.calcPreview = function(eff){
+    let res = __oldCalcPreview(eff);
+    try{ res = applyCountryPassives(eff, res) || res; }catch(err){ /*noop*/ }
+    return res;
+  };
+  // ------------------------------------------------
+  // ПРЕВЬЮ В РЕЖИМЕ «ТУМАН ВОЙНЫ»
+  // ------------------------------------------------
+  const __oldSetPreview = window.setPreview;
+  window.setPreview = function(eff){
+    if(gameMode !== 'fog') return __oldSetPreview(eff);
+    // В тумане войны показываем только текущее состояние без дельт
+    try{
+      el.pvGdp.textContent = fmt(state.gdpIdx);
+      el.pvExp.textContent = fmt(state.expIdx);
+      el.pvCpi.textContent = fmt(state.cpi)+'%';
+      el.pvGdpDelta.textContent = 'скрыто'; el.pvGdpDelta.className = 'delta';
+      el.pvExpDelta.textContent = 'скрыто'; el.pvExpDelta.className = 'delta';
+      el.pvCpiDelta.textContent = 'скрыто'; el.pvCpiDelta.className = 'delta';
+    }catch(err){ console.warn('[Pack2] fog preview warn:', err); }
+  };
+  // ------------------------------------------------
+  // ОБРАЗОВАТЕЛЬНЫЕ СПРАВКИ: подробные нотсы
+  // ------------------------------------------------
+  const historyLectures = {
+    'steel-dumping': [
+      '232-пошлины в США предназначены для защиты нацбезопасности, но вызывали встречные меры и споры в ВТО.',
+      'Антидемпинг — более таргетированный инструмент, снижает побочный ущерб всей экономике.'
+    ],
+    'sanctions-tech': [
+      'Техконтроли на продвинутые вычисления/оборудование меняют торговые потоки и инвестиционные решения.',
+      'Точечные списки и лицензии уменьшают коллатеральный вред, сохраняя гражданские каналы поставок.'
+    ],
+    'energy-shock': [
+      'Эмбарго и ценовые потолки повышают волатильность, но ускоряют перестройку цепочек поставок.',
+      'Диверсификация через СПГ и контракты снижает риск дефицитов.'
+    ],
+    'rare-earths': [
+      'Экспортные ограничения по редкоземам часто нарушают правила ВТО (прецедент по Китаю).',
+      'Долгосрочные решения — внутренняя переработка и устойчивые сделки о безопасных поставках.'
+    ],
+    'aircraft-dispute': [
+      'Тарифные войны в авиапроме повышали издержки; кооперативная рамка 2021 заморозила тарифы на 5 лет.',
+      'Переговорные механизмы снижают неопределённость и улучшают ожидания.'
+    ]
+  };
+  const __oldRenderHistory = window.renderHistory;
+  window.renderHistory = function(choice){
+    __oldRenderHistory(choice);
+    try{
+      const box = el.historyBox;
+      if(!choice) return;
+      const key = (scenarios[stepIndex] && scenarios[stepIndex].id) || '';
+      const lecture = historyLectures[key] || [];
+      if(lecture.length){
+        const extra = document.createElement('div');
+        extra.className = 'fact';
+        extra.innerHTML = `<div class="small"><b>Учебная заметка:</b><ul style="margin:6px 0 0 18px">${lecture.map(x=>`<li>${x}</li>`).join('')}</ul></div>`;
+        box.appendChild(extra);
+      }
+    }catch(err){ console.warn('[Pack2] renderHistory edu warn:', err); }
+  };
+  // ------------------------------------------------
+  // TRUST: динамика по ходам + отображение в отчёте
+  // ------------------------------------------------
+  const __oldApplyStep = window.applyStep;
+  window.applyStep = function(){
+    const beforeStep = stepIndex;
+    const logLenBefore = resultsLog.length;
+    __oldApplyStep();
+    try{
+      // после применения хода
+      const trustNow = computeTrust();
+      trustTimeline.push(trustNow);
+      // дописываем в последний лог доверие и ключ события
+      const idx = resultsLog.length - 1;
+      if(idx>=0){
+        resultsLog[idx].trust_after = trustNow;
+        const ev = stepRandom[idx] && stepRandom[idx].ev; // т.к. stepIndex уже сдвинулся
+        if(ev){ resultsLog[idx].random_key = ev.key; }
+      }
+    }catch(err){ console.warn('[Pack2] trust after step warn:', err); }
+  };
+  // В финале рисуем спарклайн доверия и добавляем заметки
+  const __oldShowResult = window.showResult;
+  window.showResult = function(){
+    __oldShowResult();
+    try{
+      // Добавим спарклайн доверия
+      const trustPanel = document.querySelector('#trustChart')?.parentElement;
+      if(trustPanel && !document.getElementById('trustLine')){
+        const wrap = document.createElement('div');
+        wrap.style.marginTop = '10px';
+        wrap.innerHTML = `<canvas id="trustLine" style="max-height:120px"></canvas>`;
+        trustPanel.appendChild(wrap);
+        const ctx = document.getElementById('trustLine').getContext('2d');
+        new Chart(ctx,{
+          type:'line',
+          data:{ labels: trustTimeline.map((_,i)=>i), datasets:[{ label:'Доверие по ходам', data: trustTimeline, tension:.35, borderColor:'#22c55e', fill:false }] },
+          options:{ plugins:{ legend:{ display:false } }, scales:{ x:{ ticks:{ color:getComputedStyle(document.body).getPropertyValue('--muted') }, grid:{ color:getComputedStyle(document.body).getPropertyValue('--line') } }, y:{ min:0, max:100, ticks:{ color:getComputedStyle(document.body).getPropertyValue('--muted') }, grid:{ color:getComputedStyle(document.body).getPropertyValue('--line') } } } }
+        );
+      }
+      // Вставим блок «Заметки расширения» (если они есть)
+      const resText = document.getElementById('resultText');
+      if(resText && pack2Notes.length){
+        const div = document.createElement('div');
+        div.className = 'small';
+        div.style.marginTop = '10px';
+        const html = pack2Notes.map(n=>`<li>Ход ${n.step}: ${n.notes.join(' ')}</li>`).join('');
+        div.innerHTML = `<hr style="border-color:var(--line);margin:8px 0"/><b>Пояснения механик (расширение):</b><ul style="margin:6px 0 0 18px">${html}</ul>`;
+        resText.appendChild(div);
+      }
+    }catch(err){ console.warn('[Pack2] showResult trust sparkline warn:', err); }
+  };
+  // ------------------------------------------------
+  // CSV/PDF: расширяем экспорт доп.показателями
+  // ------------------------------------------------
+  const __oldDownloadCSV = window.downloadCSV;
+  window.downloadCSV = function(){
+    try{
+      const header = ['step','scenario','choice','delta_gdp','delta_exp','delta_cpi','tags','random_key','random_event','sources','history','trust_after','country','mode'];
+      const rows = resultsLog.map((r,i)=>[
+        r.step,
+        csvEscape(r.scenario),
+        csvEscape(r.choice),
+        r.delta.gdp,
+        r.delta.exp,
+        r.delta.cpi,
+        csvEscape(r.tags),
+        csvEscape(r.random_key||''),
+        csvEscape(r.random_event||''),
+        csvEscape(r.sources),
+        csvEscape(r.history),
+        r.trust_after!=null? r.trust_after: computeTrust(),
+        country,
+        gameMode
+      ]);
+      const csv = [header.join(','), ...rows.map(r=>r.join(','))].join('\n');
+      const blob = new Blob([csv],{type:'text/csv;charset=utf-8;'}); const name = 'trade_wars_results_extended.csv';
+      if(window.saveAs){ saveAs(blob, name); } else { const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=name; a.click(); URL.revokeObjectURL(a.href); }
+      toast('CSV (расшир.) сформирован');
+    }catch(err){ console.warn('[Pack2] CSV warn, fallback base', err); __oldDownloadCSV(); }
+  };
+  const __oldDownloadPDF = window.downloadPDF;
+  window.downloadPDF = async function(){
+    try{
+      // Временная пометка на отчёт — режим и страна
+      const head = document.querySelector('#resultToPrint h2');
+      const mark = document.createElement('span');
+      mark.className = 'pill'; mark.style.marginLeft = '8px';
+      mark.innerHTML = `<i class="fa-solid fa-earth-europe"></i> ${country} • режим: ${gameMode}`;
+      head && head.appendChild(mark);
+    }catch{ /* noop */ }
+    return __oldDownloadPDF();
+  };
+  // ------------------------------------------------
+  // НОВЫЕ СЦЕНАРИИ (добавляем в пул, затем берём 15 случайно)
+  // ------------------------------------------------
+  const extraScenarios = [
+    { id:'cbam-eu',
+      text:'CBAM/декарбонизация импорта: как выстроить стратегию?',
+      choices:[
+        { id:'align-cbam', icon:'fa-solid fa-leaf', label:'Синхронизировать стандарты/MRV',
+          hint:'Предсказуемость и доступ на рынок ЕС', effect:{ gdp:+0.3, exp:+0.5, cpi:+0.0 }, tags:['переговоры','открытость','энергия'],
+          history:'Согласование отчётности по углеродному следу и кооперация по CBAM снижали барьеры доступа на рынок ЕС.',
+          sources:[{label:'EC — CBAM overview',url:'https://taxation-customs.ec.europa.eu/carbon-border-adjustment-mechanism_en'},{label:'EU Access2Markets — CBAM',url:'https://trade.ec.europa.eu/access-to-markets/en/news/carbon-border-adjustment-mechanism-cbam'}] },
+        { id:'offset-dom', icon:'fa-regular fa-building', label:'Субсидии на декарбонизацию внутри',
+          hint:'Инвестиции, но риск споров', effect:{ gdp:+0.4, exp:+0.1, cpi:+0.1 }, tags:['субсидии','энергия'],
+          history:'Внутренние субсидии ускоряют модернизацию, но могут вызвать споры о гос.поддержке и конкуренции.',
+          sources:[{label:'IMF — глобальные риски/фрагментация',url:'https://www.imf.org/en/Publications/WEO/Issues/2019/10/01/world-economic-outlook-october-2019'}] },
+        { id:'ignore-cbam', icon:'fa-solid fa-triangle-exclamation', label:'Игнорировать/оспаривать',
+          hint:'Рост барьеров доступа', effect:{ gdp:-0.3, exp:-0.7, cpi:+0.1 }, tags:['эскалация'],
+          history:'Отказ от адаптации к CBAM ведёт к росту издержек и снижению конкурентоспособности на рынке ЕС.',
+          sources:[{label:'EC — CBAM',url:'https://taxation-customs.ec.europa.eu/carbon-border-adjustment-mechanism_en'}] }
+      ]
+    },
+    { id:'supply-ally',
+      text:'Коалиция надёжных поставок: присоединиться к «дружественным» цепочкам?',
+      choices:[
+        { id:'join-ally', icon:'fa-regular fa-handshake', label:'Присоединиться и открыть доступ',
+          hint:'Риск зависимостей↓, экспорт↑', effect:{ gdp:+0.5, exp:+0.8, cpi:+0.0 }, tags:['диверсификация','переговоры','открытость'],
+          history:'Страны-хабы с сетью FTA выигрывали за счёт логистики и предсказуемости.',
+          sources:[{label:'EnterpriseSG — FTA/хабы',url:'https://www.enterprisesg.gov.sg/grow-your-business/go-global/international-agreements/free-trade-agreements'}] },
+        { id:'observer', icon:'fa-regular fa-eye', label:'Наблюдать, не вступая',
+          hint:'Сохраняем опции', effect:{ gdp:+0.1, exp:+0.2, cpi:+0.0 }, tags:['ожидание'],
+          history:'Сохранение опций уменьшает риск плохой интеграции, но не даёт преимуществ рынка.', sources:[{label:'IMF — delicate moment',url:'https://www.imf.org/en/Blogs/Articles/2019/04/09/blog-the-global-economy-a-delicate-moment'}] },
+        { id:'stay-out', icon:'fa-regular fa-circle-xmark', label:'Отклонить участие',
+          hint:'Автономия↑, рынки↓', effect:{ gdp:-0.2, exp:-0.6, cpi:+0.1 }, tags:['протекционизм'],
+          history:'Изоляция от коалиций повышает транзакционные издержки и риски поставок.' }
+      ]
+    },
+    { id:'macro-tight',
+      text:'Неопределённость и отток капитала. Ужесточить политику или поддержать рост?',
+      choices:[
+        { id:'tighten', icon:'fa-solid fa-chart-line', label:'Ужесточить режим/ставки',
+          hint:'Инфляция↓, рост↓', effect:{ gdp:-0.3, exp:-0.1, cpi:-0.3 }, tags:['стабилизация'],
+          history:'Жёсткая политика охлаждает инфляцию и курсовые колебания ценой замедления.', },
+        { id:'support', icon:'fa-regular fa-hand-holding-heart', label:'Поддержка инвестиций',
+          hint:'Рост↑, инфляция↑', effect:{ gdp:+0.4, exp:+0.2, cpi:+0.2 }, tags:['субсидии'],
+          history:'Инвестиции и гарантии стимулируют активность, но могут подогреть цены.', },
+        { id:'mix2', icon:'fa-solid fa-scale-balanced', label:'Смешанный подход',
+          hint:'Баланс рисков', effect:{ gdp:+0.2, exp:+0.1, cpi:-0.1 }, tags:['устойчивость'] }
+      ]
+    }
+  ];
+  // Вставляем доп.пул в базовый массив сценариев
+  try{
+    extraScenarios.forEach(s=> window.scenariosBase && window.scenariosBase.push(s));
+  }catch(err){ console.warn('[Pack2] push scenarios warn:', err); }
+  // Пересборка колоды: берём 15 случайных, сохраняя страновые замены
+  const __oldBuildDeck = window.buildScenarioDeck;
+  window.buildScenarioDeck = function(c){
+    const base = __oldBuildDeck(c) || [];
+    // доберём из расширенного пула
+    const pool = (window.scenariosBase||[]).filter(x=> base.indexOf(x)===-1);
+    const need = Math.max(0, 18 - base.length); // небольшой избыток кандидатов
+    const pick = [];
+    const tmp = pool.slice();
+    while(pick.length<need && tmp.length){ pick.push(tmp.splice(Math.floor(Math.random()*tmp.length),1)[0]); }
+    const merged = base.concat(pick);
+    // перетасуем и возьмём первые 15
+    for(let i=merged.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [merged[i],merged[j]]=[merged[j],merged[i]]; }
+    return merged.slice(0,15);
+  };
+  // Обновим существующую игру, если уже запущена
+  try{
+    if(el && el.lblTotal){ el.lblTotal.textContent = 12; }
+  }catch{ /* noop */ }
+  // ------------------------------------------------
+  // МАЛЫЕ ВИЗУАЛЬНЫЕ ПРАВКИ ДЛЯ ВЫРАВНИВАНИЯ
+  // ------------------------------------------------
+  (function injectMinorStyles(){
+    if(document.getElementById('pack2-style')) return;
+    const st = document.createElement('style'); st.id='pack2-style';
+    st.textContent = `
+      #modePanel .choice { background: var(--panel); }
+      #modePanel .choice input[type=radio]{ width:16px; height:16px; }
+      #trustLine { filter: drop-shadow(0 2px 6px rgba(0,0,0,.15)); }
+      .history .fact + .fact { margin-top:6px; }
+      .panel .note b { color: var(--ink); }
+    `;
+    document.head.appendChild(st);
+  })();
+  // ------------------------------------------------
+  // ПОДСКАЗКИ ПО МЕХАНИКАМ (всплывашка-инфо в симуляции)
+  // ------------------------------------------------
+  function injectHints(){
+    try{
+      if(document.getElementById('hintBox')) return;
+      const side = document.querySelector('#screenSim .side');
+      if(!side) return;
+      const box = document.createElement('div'); box.className='panel'; box.id='hintBox';
+      box.innerHTML = `
+        <h3><i class="fa-regular fa-lightbulb"></i> Подсказка</h3>
+        <div class="note">В режиме <b>Сложный</b> негативные события чуть вероятнее; в <b>Туман войны</b> превью эффектов скрыто до применения.
+        Усиленные страновые механики (США/Китай/ЕС/Разв.) модифицируют эффекты действий.</div>`;
+      side.appendChild(box);
+    }catch(err){ console.warn('[Pack2] hints warn:', err); }
+  }
+  // Перехват showSim, чтобы вставить подсказку
+  const __oldShowSim = window.showSim;
+  window.showSim = function(){
+    __oldShowSim();
+    injectHints();
+  };
+  // ------------------------------------------------
+  // ДИАПАЗОН МЕТРИК — лёгкая коррекция для устойчивости графиков
+  // ------------------------------------------------
+  const __oldBuildMainChart = window.buildMainChart;
+  window.buildMainChart = function(){
+    __oldBuildMainChart();
+    try{
+      if(mainChart){
+        mainChart.options.scales.y.suggestedMin = 80;
+        mainChart.options.scales.y.suggestedMax = 140;
+        mainChart.update();
+      }
+    }catch(err){ console.warn('[Pack2] chart bounds warn:', err); }
+  };
+  // ------------------------------------------------
+  // Быстрый справочник источников (для UX) — блок-ссылка в конце отчёта
+  // ------------------------------------------------
+  const __oldShowResult2 = window.showResult;
+  window.showResult = function(){
+    __oldShowResult2();
+    try{
+      const container = document.querySelector('#screenResult .card.pad');
+      if(container && !document.getElementById('refBlock')){
+        const block = document.createElement('div');
+        block.id='refBlock'; block.className='panel'; block.style.marginTop='14px';
+        block.innerHTML = `
+          <h3><i class="fa-solid fa-link"></i> Справочные материалы (подборка)</h3>
+          <div class="small">
+            <a target="_blank" rel="noopener" href="https://www.bis.gov/about-bis/bis-leadership-and-offices/SIES/section-232-investigations/section-232-steel-aluminum">BIS — Section 232 (сталь/алюминий)</a> ·
+            <a target="_blank" rel="noopener" href="https://www.wto.org/english/tratop_e/dispu_e/cases_e/ds544_e.htm">WTO DS544 — США: 232 меры</a> ·
+            <a target="_blank" rel="noopener" href="https://www.wto.org/english/tratop_e/dispu_e/cases_e/ds431_e.htm">WTO DS431 — редкоземы</a> ·
+            <a target="_blank" rel="noopener" href="https://ustr.gov/about-us/policy-offices/press-office/press-releases/2021/june/ustr-announces-joint-us-eu-cooperative-framework-large-civil-aircraft">USTR — рамка по авиапрому</a> ·
+            <a target="_blank" rel="noopener" href="https://taxation-customs.ec.europa.eu/carbon-border-adjustment-mechanism_en">EC — CBAM</a> ·
+            <a target="_blank" rel="noopener" href="https://www.iea.org/commentaries/what-drives-natural-gas-price-volatility-in-europe-and-beyond">IEA — волатильность газа</a> ·
+            <a target="_blank" rel="noopener" href="https://ofac.treasury.gov/faqs/1147">OFAC — FAQ 1147 (FFI)</a> ·
+            <a target="_blank" rel="noopener" href="https://www.imf.org/en/Blogs/Articles/2019/10/15/the-world-economy-synchronized-slowdown-precarious-outlook">IMF — synchronized slowdown</a>
+          </div>`;
+        container.appendChild(block);
+      }
+    }catch(err){ console.warn('[Pack2] ref block warn:', err); }
+  };
+  // ------------------------------------------------
+  // КОНЕЦ РАСШИРЕНИЯ
+  // ------------------------------------------------
+})();
+
+// --- Ensure single-tap activation for Next button on touch devices ---
+(function ensureNextSingleTap(){
+  const btn = document.getElementById('btnNext');
+  if (!btn) return;
+  // prevent double-tap zoom issues on iOS
+  btn.addEventListener('touchend', function(e){ e.preventDefault(); btn.click(); }, {passive:false});
+})();
+
+
+/*
+  === Пасхалка r6tr0 / amir ===
+  Активация (в коде, чтобы игрок сам не догадался):
+  — Desktop: удерживай Shift и нажми "E", затем набери по буквам r6tr0 (нечувствительно к регистру).
+  — Mobile: сделай 3 быстрых тапа по левому логотипу, затем долгий тап 800мс.
+  Подсказки для теста разработчика оставлены в комментариях.
+*/
+(function eggInit(){
+  const mask = document.getElementById('eggMask');
+  const close = document.getElementById('eggClose');
+  const logo = document.querySelector('.brand'); // левый логотип/заголовок
+  function openEgg(){ mask.style.display='grid'; }
+  function closeEgg(){ mask.style.display='none'; }
+  close.addEventListener('click', closeEgg);
+
+  // Desktop combo: Shift+E then type r6tr0
+  let armed = false, buffer = '';
+  window.addEventListener('keydown', (e)=>{
+    if (e.key.toLowerCase()==='e' && e.shiftKey){ armed = true; buffer=''; }
+    else if (armed){
+      buffer += e.key.toLowerCase();
+      if (!'r6tr0'.startsWith(buffer)) { armed=false; buffer=''; }
+      else if (buffer==='r6tr0'){ openEgg(); armed=false; buffer=''; }
+    }
+  });
+
+  // Mobile: triple-tap then long-press
+  let taps = 0, lastTap = 0, pressTimer=null;
+  function onTap(){
+    const now = Date.now();
+    if (now - lastTap < 400) taps++; else taps=1;
+    lastTap = now;
+    if (taps>=3){
+      // ждём долгого удержания
+      if (pressTimer) clearTimeout(pressTimer);
+      logo.addEventListener('touchstart', ()=>{
+        pressTimer = setTimeout(openEgg, 800);
+      }, {once:true});
+      logo.addEventListener('touchend', ()=>{ if (pressTimer) clearTimeout(pressTimer); }, {once:true});
+    }
+  }
+  if (logo){
+    logo.addEventListener('click', onTap);
+    logo.addEventListener('touchend', (e)=>{ e.preventDefault(); onTap(); }, {passive:false});
+  }
+})();
+
+
+// Adjust chart heights for device
+(function adjustChartHeights(){
+  const isMobile = window.matchMedia('(max-width: 768px)').matches;
+  document.documentElement.setAttribute('data-device', isMobile ? 'mobile' : 'desktop');
+  const h = isMobile ? '240px' : '360px';
+  document.documentElement.style.setProperty('--chart-h', h);
+})();
+
+</script>
+<!-- === ЗАХОД 3/3: ВЕТВЛЕНИЯ, ВИКТОРИНЫ, ПРОДВИНУТАЯ ПЕЧАТЬ (вставить этот <script> ПОСЛЕ pack2 и ПЕРЕД </body>) === -->
+<script id="pack3">
+// ======================================================================================
+// SIM EXTENSION PACK v3 — кампании по странам, единый выбор страны (карточки),
+// стартовые сдвиги экономики, мини‑викторины, разбор доверия по категориям,
+// расширенный PDF (страницы по квизам/брейкдаун доверия), косметика и выравнивания.
+// Установка: подключить этот блок СРАЗУ ПОСЛЕ pack2 (<script id="pack2">) и до </body>.
+// Совместим с v3.3 базы + pack2. Ничего в базовом коде править не требуется.
+// ======================================================================================
+(function(){
+  if(typeof window === 'undefined' || !document || !window.countryMods){
+    console.error('[Pack3] Базовые объекты не найдены. Подключите после pack2.');
+    return;
+  }
+  // ---------------------------------------------------------------
+  // ГАРАНТИРУЕМ ЕДИНЫЙ СПОСОБ ВЫБОРА СТРАНЫ: ТОЛЬКО КАРТОЧКИ
+  // (селектор #selCountry остаётся в DOM для совместимости с базовым
+  // обработчиком, но мы его прячем и полностью управляем через карточки)
+  // ---------------------------------------------------------------
+  (function unifyCountrySelect(){
+    try{
+      const sel = document.getElementById('selCountry');
+      if(sel){ sel.style.display = 'none'; sel.setAttribute('aria-hidden','true'); }
+      // подчистим label
+      const lbl = document.querySelector('label[for="selCountry"]');
+      if(lbl){ lbl.style.display = 'none'; }
+      // Подсветка и выбор — через уже существующие карточки влияния
+      // Убедимся, что при первой загрузке подсвечена страна из select
+      const cur = (sel && sel.value) || 'USA';
+      if(window.el && el.infGrid){
+        setTimeout(()=>{
+          // Перерисуем карточки и подсветим текущую
+          if(typeof window.renderInfluenceCards === 'function'){
+            renderInfluenceCards();
+            // дублируем выбор в селектор для совместимости базового старта
+            if(sel) sel.value = cur;
+          }
+        }, 0);
+      }
+      // Блокируем любые попытки показать селектор снова
+      const mo = new MutationObserver(()=>{ if(sel && sel.style.display!=='none'){ sel.style.display='none'; } });
+      if(sel){ mo.observe(sel, { attributes:true, attributeFilter:['style','class'] }); }
+    }catch(err){ console.warn('[Pack3] unifyCountrySelect warn:', err); }
+  })();
+  // ---------------------------------------------------------------
+  // СТАРТОВЫЕ СДВИГИ ЭКОНОМИКИ ПО СТРАНАМ (сильнее влияние выбора)
+  // Применяются один раз при входе в симуляцию до 1-го хода.
+  // ---------------------------------------------------------------
+  let __startBiasApplied = false;
+  const startBias = {
+    USA: { gdp:+0.2, exp:+0.0, cpi:+0.1, note:'США: выше зарплаты/спрос — CPI чуть выше, рост устойчивый.' },
+    CHN: { gdp:+0.0, exp:+1.0, cpi:-0.1, note:'Китай: усиленный экспортный потенциал, CPI чуть ниже.' },
+    EU : { gdp:+0.1, exp:+0.0, cpi:-0.2, note:'ЕС: энергосберегающие практики, CPI ниже базовой.' },
+    DEV: { gdp:-0.5, exp:+0.2, cpi:+0.4, note:'Развивающаяся: волатильность/инфляция выше, но шанс роста экспорта.' }
+  };
+  function applyStartBias(){
+    try{
+      if(__startBiasApplied) return;
+      const c = (typeof window.country === 'string' && window.country) || 'USA';
+      const b = startBias[c] || null; if(!b) return;
+      state.gdpIdx = clamp(state.gdpIdx + (b.gdp||0), 60,160);
+      state.expIdx = clamp(state.expIdx + (b.exp||0), 60,160);
+      state.cpi = clamp(state.cpi + (b.cpi||0), 0, 25);
+      timeline[0] = { ...state };
+      if(window.months && months.length){ months[0] = 0; }
+      __startBiasApplied = true;
+      if(window.toast && b.note){ toast(b.note); }
+    }catch(err){ console.warn('[Pack3] start bias warn:', err); }
+  }
+  // Перехватываем showSim, чтобы внести стартовый сдвиг до отрисовки графиков
+  const __oldShowSim = window.showSim;
+  window.showSim = function(){
+    __oldShowSim();
+    try{
+      applyStartBias();
+      if(typeof window.buildMainChart === 'function'){
+        // переобновим главный график, чтобы отразить bias
+        if(window.mainChart){ window.updateMainChart && updateMainChart(); }
+        else { buildMainChart(); }
+      }
+      injectQuizPanel();
+      injectCampaignBadge();
+    }catch(err){ console.warn('[Pack3] showSim patch warn:', err); }
+  };
+  // ---------------------------------------------------------------
+  // МИНИ‑ВИКТОРИНЫ: закрепляем материал
+  // Панель в сайдбаре; по одному вопросу на сценарий.
+  // ---------------------------------------------------------------
+  window.quizLog = window.quizLog || []; // { step, id, q, answers:[...], correctIdx, chosenIdx, correct }
+  const quizBank = {
+    'steel-dumping': {
+      q: 'Какой инструмент в среднем вносит наименьший побочный ущерб по всей экономике при борьбе с демпингом стали?',
+      a: ['Высокие тарифы по «нацбезопасности»','Точечные антидемпинговые меры','Полный отказ от защиты'],
+      i: 1,
+      why: 'Антидемпинг таргетирован на конкретных поставщиков/потоки и меньше деформирует входы для всех отраслей.'
+    },
+    'sanctions-tech': {
+      q: 'Чем точечные техконтроли отличаются от полного пакета?',
+      a: ['Их сложнее администрировать, но меньше коллатеральный ущерб','Они всегда сильнее бьют по инфляции','Ничем не отличаются'],
+      i: 0,
+      why: 'Точечность позволяет сохранять гражданские каналы и ограничивать критичные ВПК‑товары/ПО.'
+    },
+    'energy-shock': {
+      q: 'Что исторически лучше снижало риск дефицита при энергошоке?',
+      a: ['Жёсткий импортный запрет','Комбинация частичного запрета и замещения','Игнорировать шок'],
+      i: 1,
+      why: 'Комбинация ограничений и контрактов на альтернативы (СПГ) чаще сглаживала дефициты и волатильность.'
+    },
+    'rare-earths': {
+      q: 'Почему экспортные ограничения на редкоземы часто проблемны в ВТО?',
+      a: ['Они повышают цены для импортеров','Они противоречат обязательствам без подходящих исключений','Их трудно администрировать'],
+      i: 1,
+      why: 'Прецеденты (например, спор против Китая) показывали несоответствие обязательствам при отсутствии допустимых исключений.'
+    },
+    'aircraft-dispute': {
+      q: 'Какой исход спора по авиапрому в 2021 г. между США и ЕС снизил тарифную неопределённость?',
+      a: ['Эскалация тарифов','Кооперативная рамка и заморозка тарифов','Отсутствие договорённостей'],
+      i: 1,
+      why: 'Рамка США‑ЕС приостановила взаимные тарифы на 5 лет и снизила риски.'
+    },
+    'agri-export': {
+      q: 'Что обычно даёт меньше глобальных искажений при скачке цен на продовольствие?',
+      a: ['Запрет экспорта','Адресная поддержка домохозяйств','Постоянное снижение пошлин на импорт'],
+      i: 1,
+      why: 'Адресная поддержка смягчает удар без разрушения экспортных каналов и глобального рынка.'
+    },
+    'chip-war': {
+      q: 'Чем кооперация по стандартам и безопасным цепочкам полезна в микроэлектронике?',
+      a: ['Всегда повышает инфляцию','Снижает неопределённость и поддерживает инвестиции','Ничем не помогает'],
+      i: 1,
+      why: 'Совместные стандарты/гарантии цепочек снижают риск и упрощают планирование инвестиций.'
+    },
+    'cbam-eu': {
+      q: 'Зачем синхронизировать MRV/углеродный учёт под CBAM при экспорте в ЕС?',
+      a: ['Чтобы получить субсидии ЕС','Чтобы избегать барьеров и обеспечить предсказуемый доступ на рынок','Чтобы повысить импортные пошлины ЕС'],
+      i: 1,
+      why: 'Совместимость учёта/отчётности снижает барьеры и делает доступ на рынок предсказуемым.'
+    }
+  };
+  function injectQuizPanel(){
+    try{
+      if(document.getElementById('quizBox')) return;
+      const side = document.querySelector('#screenSim .side'); if(!side) return;
+      const box = document.createElement('div');
+      box.className = 'panel'; box.id = 'quizBox';
+      box.innerHTML = `
+        <h3><i class="fa-solid fa-question"></i> Мини‑викторина</h3>
+        <div class="note" id="quizWrap">После выбора варианта здесь появится вопрос по теме хода.</div>`;
+      side.appendChild(box);
+    }catch(err){ console.warn('[Pack3] quiz panel warn:', err); }
+  }
+  function renderQuizForCurrent(){
+    try{
+      const curr = window.scenarios && scenarios[stepIndex];
+      const qbox = document.getElementById('quizWrap'); if(!curr || !qbox) return;
+      const qb = quizBank[curr.id]; if(!qb){ qbox.innerHTML = '<span class="small">Вопрос по этой теме не подготовлен.</span>'; return; }
+      const answered = quizLog.find(x=>x.step===stepIndex+1);
+      const options = qb.a.map((t,i)=>`<button class="btn" data-i="${i}" style="margin:4px 4px 0 0">${t}</button>`).join('');
+      const html = `<div class="small" style="margin-bottom:6px"><b>${qb.q}</b></div>${options}`;
+      qbox.innerHTML = html;
+      if(answered){
+        // отрендерим как завершённый
+        finalizeQuizUI(answered.chosenIdx===answered.correctIdx, qb.why, answered.correctIdx);
+      } else {
+        qbox.querySelectorAll('button[data-i]').forEach(b=>{
+          b.addEventListener('click', (e)=>{
+            const idx = Number(e.currentTarget.getAttribute('data-i'));
+            onQuizAnswer(curr, qb, idx);
+          });
+        });
+      }
+    }catch(err){ console.warn('[Pack3] renderQuiz warn:', err); }
+  }
+  function finalizeQuizUI(correct, why, correctIdx){
+    try{
+      const qbox = document.getElementById('quizWrap'); if(!qbox) return;
+      qbox.querySelectorAll('button[data-i]').forEach(btn=>{
+        const i = Number(btn.getAttribute('data-i'));
+        btn.disabled = true;
+        if(i===correctIdx) btn.classList.add('success');
+        btn.style.opacity = i===correctIdx ? '1' : '0.65';
+      });
+      const div = document.createElement('div');
+      div.className = 'small'; div.style.marginTop = '6px';
+      div.innerHTML = correct ? '<b>Верно!</b> ' + why : '<b>Неверно.</b> ' + why;
+      qbox.appendChild(div);
+    }catch(err){ console.warn('[Pack3] finalizeQuizUI warn:', err); }
+  }
+  function onQuizAnswer(curr, qb, chosenIdx){
+    try{
+      const rec = { step: stepIndex+1, id: curr.id, q: qb.q, answers: qb.a.slice(), correctIdx: qb.i, chosenIdx, correct: chosenIdx===qb.i };
+      const exists = quizLog.find(x=>x.step===rec.step);
+      if(!exists) quizLog.push(rec); else Object.assign(exists, rec);
+      finalizeQuizUI(rec.correct, qb.why, qb.i);
+    }catch(err){ console.warn('[Pack3] quiz answer warn:', err); }
+  }
+  // Перехват выбора варианта, чтобы рендерить квиз
+  const __oldOnSelectChoice = window.onSelectChoice;
+  window.onSelectChoice = function(choice){
+    const r = __oldOnSelectChoice(choice);
+    renderQuizForCurrent();
+    return r;
+  };
+  // При смене шага (после применения) квиз подменяется под новый сценарий
+  const __oldApplyStep = window.applyStep;
+  window.applyStep = function(){
+    __oldApplyStep();
+    renderQuizForCurrent();
+  };
+  // ---------------------------------------------------------------
+  // КАМПАНИИ/ВЕТВЛЕНИЯ: уникальные сценарии по триггерам выбора
+  // ---------------------------------------------------------------
+  const campaignState = { inserted: {}, counters: {} };
+  function markChoiceForCampaign(choiceId){
+    campaignState.counters[choiceId] = (campaignState.counters[choiceId]||0)+1;
+  }
+  // Определим специальные сценарии для подстановки
+  const branchScenarios = {
+    'usa-friendshoring': {
+      id:'usa-friendshoring',
+      text:'США: Развить friend‑shoring в Америке (углубить цепочки с соседями)?',
+      choices:[
+        { id:'usa-friend-deals', icon:'fa-solid fa-people-group', label:'Пакет сделок по цепочкам',
+          hint:'Предсказуемые поставки, экспорт↑', effect:{ gdp:+0.5, exp:+0.8, cpi:+0.0 }, tags:['переговоры','диверсификация','открытость'],
+          history:'Friend‑shoring снижает риск разрывов и укрепляет региональные цепочки поставок.', sources:[{label:'IMF — фрагментация/цепочки',url:'https://www.imf.org/en/Blogs/Articles/2019/10/15/the-world-economy-synchronized-slowdown-precarious-outlook'}] },
+        { id:'usa-friend-pause', icon:'fa-solid fa-circle-pause', label:'Подождать оценку',
+          hint:'Меньше рисков сейчас', effect:{ gdp:+0.1, exp:+0.2, cpi:+0.0 }, tags:['ожидание'],
+          history:'Пауза сохраняет опции, но не даёт доступа к эффектам масштаба.' }
+      ]
+    },
+    'eu-autonomy': {
+      id:'eu-autonomy',
+      text:'ЕС: Углубить «стратегическую автономию» через совместные закупки/СПГ и стандарты?',
+      choices:[
+        { id:'eu-auto-proc', icon:'fa-solid fa-boxes-packing', label:'Совместные закупки и стандарты',
+          hint:'Волатильность↓, доверие↑', effect:{ gdp:+0.4, exp:+0.3, cpi:-0.1 }, tags:['энергия','переговоры','устойчивость'],
+          history:'Совместные закупки/стандарты снижали волатильность и усиливали переговорную позицию.' },
+        { id:'eu-auto-solo', icon:'fa-solid fa-route', label:'Каждый сам по себе',
+          hint:'Координация↓', effect:{ gdp:+0.0, exp:+0.0, cpi:+0.1 }, tags:['ожидание'],
+          history:'Отсутствие координации повышает транзакционные издержки.' }
+      ]
+    },
+    'chn-south-fta': {
+      id:'chn-south-fta',
+      text:'Китай: Расширить сеть FTA с Глобальным Югом?',
+      choices:[
+        { id:'chn-fta-expand', icon:'fa-solid fa-handshake', label:'Да, расширять',
+          hint:'Экспорт и логистика↑', effect:{ gdp:+0.4, exp:+0.9, cpi:+0.0 }, tags:['открытость','диверсификация','логистика'],
+          history:'Расширение FTA увеличивает доступ к рынкам и снижает риски логистики.' },
+        { id:'chn-fta-slow', icon:'fa-regular fa-clock', label:'Медленное продвижение',
+          hint:'Умеренный эффект', effect:{ gdp:+0.2, exp:+0.3, cpi:+0.0 }, tags:['ожидание'] }
+      ]
+    },
+    'dev-investment': {
+      id:'dev-investment',
+      text:'Развивающаяся: Агентство продвижения инвестиций и режим «единого окна»?',
+      choices:[
+        { id:'dev-one-stop', icon:'fa-solid fa-building-columns', label:'Запуск «единого окна»',
+          hint:'Инвестиции↑, экспорт↑', effect:{ gdp:+0.5, exp:+0.7, cpi:+0.0 }, tags:['открытость','устойчивость'],
+          history:'Упрощение процедур снижает барьеры входа и ускоряет проекты.' },
+        { id:'dev-keep-bureau', icon:'fa-solid fa-folder-tree', label:'Сохранить текущие процессы',
+          hint:'Без изменений', effect:{ gdp:+0.0, exp:+0.0, cpi:+0.0 }, tags:['ожидание'] }
+      ]
+    }
+  };
+  function tryInsertBranch(){
+    try{
+      // Выберем таргет: ближайший следующий шаг (через 1)
+      const target = Math.min(stepIndex+1, scenarios.length-1);
+      const has = (id)=> campaignState.inserted[id];
+      if(country==='USA'){
+        if(!has('usa-friendshoring') && campaignState.counters['ira-boost'] && campaignState.counters['coord']){
+          scenarios[target] = branchScenarios['usa-friendshoring'];
+          campaignState.inserted['usa-friendshoring'] = true; pack3Note(`Ветвление США: friend‑shoring активирован на шаге ${target+1}.`);
+        }
+      }
+      if(country==='EU'){
+        if(!has('eu-autonomy') && campaignState.counters['talks-eu'] && campaignState.counters['lng-deals']){
+          scenarios[target] = branchScenarios['eu-autonomy'];
+          campaignState.inserted['eu-autonomy'] = true; pack3Note(`Ветвление ЕС: стратегическая автономия на шаге ${target+1}.`);
+        }
+      }
+      if(country==='CHN'){
+        if(!has('chn-south-fta') && campaignState.counters['expand-pli'] && campaignState.counters['deals']){
+          scenarios[target] = branchScenarios['chn-south-fta'];
+          campaignState.inserted['chn-south-fta'] = true; pack3Note(`Ветвление Китай: FTA с Глобальным Югом на шаге ${target+1}.`);
+        }
+      }
+      if(country==='DEV'){
+        if(!has('dev-investment') && campaignState.counters['hub'] && campaignState.counters['de-risk']){
+          scenarios[target] = branchScenarios['dev-investment'];
+          campaignState.inserted['dev-investment'] = true; pack3Note(`Ветвление Развивающаяся: единое окно инвестиций на шаге ${target+1}.`);
+        }
+      }
+    }catch(err){ console.warn('[Pack3] tryInsertBranch warn:', err); }
+  }
+  // Отмечаем выбранные ID вариантов для триггеров кампаний
+  const __oldOnSelectChoice2 = window.onSelectChoice;
+  window.onSelectChoice = function(choice){
+    try{ markChoiceForCampaign(choice.id); }catch{}
+    return __oldOnSelectChoice2(choice);
+  };
+  // Вставляем ветку после применения шага (чтобы следующий шаг подменился)
+  const __oldApplyStep2 = window.applyStep;
+  window.applyStep = function(){
+    __oldApplyStep2();
+    tryInsertBranch();
+  };
+  function injectCampaignBadge(){
+    try{
+      const pill = document.querySelector('#screenSim .pill');
+      if(pill && !document.getElementById('cmpBadge')){
+        const span = document.createElement('span');
+        span.id='cmpBadge'; span.className='pill'; span.style.marginLeft='8px';
+        span.innerHTML = '<i class="fa-solid fa-route"></i> мини‑кампании активны';
+        pill.parentElement && pill.parentElement.insertBefore(span, pill.nextSibling);
+      }
+    }catch(err){ console.warn('[Pack3] badge warn:', err); }
+  }
+  // ---------------------------------------------------------------
+  // БРЕЙКДАУН ДОВЕРИЯ ПО КАТЕГОРИЯМ + ЧАРТ
+  // ---------------------------------------------------------------
+  function computeTrustBreakdown(){
+    const weights = { 'переговоры': +8, 'право': +7, 'открытость': +7, 'диверсификация': +6, 'устойчивость': +5, 'субсидии': +2,
+                      'санкции': -6, 'техконтроль': -5, 'эскалация': -8, 'квоты': -6, 'safeguard': -5, 'протекционизм': -7, 'экспорт-контроль': -5, 'тарифы': -4 };
+    const map = {};
+    resultsLog.forEach(r=>{
+      (r.tags||'').split(',').map(s=>s.trim()).filter(Boolean).forEach(tag=>{
+        const w = weights[tag]; if(w==null) return; map[tag] = (map[tag]||0) + w; });
+    });
+    // Свернём в группы «Кооперация», «Защита», «Санкции/эскалация» для обзора
+    const groups = { 'Кооперация': ['переговоры','право','открытость','диверсификация','устойчивость','субсидии'],
+                     'Барьеры/Защита': ['квоты','safeguard','тарифы','экспорт-контроль'],
+                     'Санкции/Эскалация': ['санкции','техконтроль','протекционизм','эскалация'] };
+    const gsum = {};
+    Object.keys(groups).forEach(k=>{ gsum[k] = groups[k].reduce((acc,t)=> acc + (map[t]||0), 0); });
+    return { byTag: map, byGroup: gsum };
+  }
+  function drawTrustBreakdown(){
+    try{
+      const panelWrap = document.querySelector('#screenResult #resultToPrint .grid.cols-2');
+      if(!panelWrap) return;
+      // Вставим отдельную панель справа под «Лог ходов» или под ним
+      let mount = document.getElementById('trustBreakPanel');
+      if(!mount){
+        const right = panelWrap.children[1];
+        mount = document.createElement('div'); mount.className='panel'; mount.id='trustBreakPanel'; mount.style.marginTop='12px';
+        mount.innerHTML = '<h3><i class="fa-solid fa-chart-simple"></i> Структура индекса доверия</h3>\
+        <canvas id="trustBreakChart" style="max-height:220px"></canvas>\
+        <div class="small muted" id="trustBreakNote">—</div>';
+        right.appendChild(mount);
+      }
+      const br = computeTrustBreakdown();
+      // барчарт по группам
+      const ctx = document.getElementById('trustBreakChart').getContext('2d');
+      if(window.trustBreakChart) try{ window.trustBreakChart.destroy(); }catch{}
+      window.trustBreakChart = new Chart(ctx,{
+        type:'bar',
+        data:{ labels: Object.keys(br.byGroup), datasets:[{ label:'Вклад', data:Object.values(br.byGroup), backgroundColor:['#22c55e','#60a5fa','#ef4444'] }] },
+        options:{ indexAxis:'y', plugins:{ legend:{ display:false } }, scales:{ x:{ grid:{ color:getComputedStyle(document.body).getPropertyValue('--line') }, ticks:{ color:getComputedStyle(document.body).getPropertyValue('--muted') } }, y:{ grid:{ color:getComputedStyle(document.body).getPropertyValue('--line') }, ticks:{ color:getComputedStyle(document.body).getPropertyValue('--muted') } } } }
+      );
+      document.getElementById('trustBreakNote').textContent = 'Положительные значения — вклад кооперации; отрицательные — вклад барьеров/эскалации.';
+    }catch(err){ console.warn('[Pack3] trust breakdown warn:', err); }
+  }
+  // Добавим отрисовку брейкдауна при показе результатов
+  const __oldShowResult = window.showResult;
+  window.showResult = function(){
+    __oldShowResult();
+    drawTrustBreakdown();
+    renderKnowledgeAppendix();
+    appendQuizSummaryToMoves();
+  };
+  // ---------------------------------------------------------------
+  // ОБУЧАЮЩЕЕ ПРИЛОЖЕНИЕ: справка по темам, встреченным в игре
+  // ---------------------------------------------------------------
+  const knowledgeBase = {
+    'тарифы': 'Тарифы быстро защищают отдельные отрасли, но повышают издержки по цепочке и провоцируют ответные меры. Эффект на экспорт часто отрицательный.' ,
+    'антидемпинг': 'Антидемпинговые меры таргетируют конкретные потоки/поставщиков после процедур расследования. Обычно меньше искажают экономику, чем широкие тарифы.' ,
+    'санкции': 'Жёсткие санкции и вторичные меры фрагментируют финансовые потоки и цепочки; эффект зависит от коалиции и таргетированности.' ,
+    'техконтроль': 'Экспортконтроль в высоких технологиях влияет на оборудование, ПО и сервис; переговорные рамки и стандарты уменьшают неопределённость.' ,
+    'переговоры': 'Переговоры/рамки снижают премию неопределённости, повышают доверие партнёров и инвестиции.' ,
+    'диверсификация': 'Диверсификация рынков/цепей снижает уязвимость к шокам; хабовые стратегии усиливают экспорт.' ,
+    'энергия': 'Энергошоки смягчаются через регазификацию, контракты на СПГ и экономию/эффективность; CBAM — инструмент углеродной корректировки на границе.' ,
+    'право': 'Правовой путь в ВТО/судах долгий, но уменьшает эскалацию и повышает предсказуемость правил.' ,
+    'экспортные-ограничения': 'Ограничения экспорта стратегических сырьевых товаров часто спорны в ВТО; устойчивое решение — внутренняя переработка и сделки о поставках.' ,
+    'safeguard': 'Защитные меры (квоты/тарифные квоты) временно стабилизируют отрасль, но могут приводить к дефицитам и росту цен.'
+  };
+  function renderKnowledgeAppendix(){
+    try{
+      const right = document.querySelector('#screenResult #resultToPrint .grid.cols-2').children[1];
+      if(!right) return;
+      let panel = document.getElementById('eduAppendix');
+      if(!panel){
+        panel = document.createElement('div'); panel.id='eduAppendix'; panel.className='panel'; panel.style.marginTop='12px';
+        right.appendChild(panel);
+      }
+      const tags = Array.from(new Set(resultsLog.flatMap(r => (r.tags||'').split(',').map(s=>s.trim()).filter(Boolean))));
+      const items = tags.map(t=> `<li><b>${t}</b>: ${knowledgeBase[t]||'—'}</li>`).join('');
+      panel.innerHTML = `<h3><i class=\"fa-solid fa-graduation-cap\"></i> Справка по темам из ваших ходов</h3><div class=\"small\"><ul style=\"margin:6px 0 0 18px\">${items||'<li>—</li>'}</ul></div>`;
+    }catch(err){ console.warn('[Pack3] knowledge appendix warn:', err); }
+  }
+  // ---------------------------------------------------------------
+  // ДОБАВИМ РЕЗУЛЬТАТЫ ВИКТОРИНЫ В ЛОГ ХОДОВ (кратко)
+  // ---------------------------------------------------------------
+  function appendQuizSummaryToMoves(){
+    try{
+      const cont = document.getElementById('movesLog'); if(!cont) return;
+      const blocks = cont.querySelectorAll('div');
+      // Сопоставим по номеру шага (в логах — в порядке)
+      quizLog.forEach(q=>{
+        const idx = q.step - 1; const node = blocks[idx]; if(!node) return;
+        const p = document.createElement('div'); p.className='small';
+        p.innerHTML = `<i class=\"fa-solid fa-circle-question\"></i> Викторина: <b>${q.correct? 'верно' : 'неверно'}</b>.`;
+        node.appendChild(p);
+      });
+    }catch(err){ console.warn('[Pack3] append quiz to moves warn:', err); }
+  }
+  // ---------------------------------------------------------------
+  // PDF: ДОП. СТРАНИЦЫ (брейкдаун доверия + квизы)
+  // ---------------------------------------------------------------
+  const __oldPDF = window.downloadPDF;
+  window.downloadPDF = async function(){
+    try{
+      await Promise.resolve();
+      const { jsPDF } = window.jspdf; if(!jsPDF) return __oldPDF();
+      // Сначала базовый отчёт (скриншот resultToPrint + краткий лог) — делает pack1/2
+      await __oldPDF();
+      // Откроем документ повторно и добавим страницы? jsPDF не сохраняет состояние после save().
+      // Поэтому создадим ОТДЕЛЬНЫЙ DOC для допстраниц и сольём в один Blob (ограничения браузера). Проще: сформируем второй PDF и выведем отдельно.
+      // Чтобы не усложнять — формируем ДОП.ПДФ «applications.pdf».
+      const pdf = new jsPDF({ unit:'pt', format:'a4', compress:true });
+      const pageW = pdf.internal.pageSize.getWidth(), pageH = pdf.internal.pageSize.getHeight();
+      // Стр.1 — Брейкдаун доверия (снимок канваса)
+      pdf.setFont('helvetica','bold'); pdf.setFontSize(16); pdf.text('Индекс доверия — структура', 40, 40);
+      // Убедимся, что отрисован
+      drawTrustBreakdown(); await new Promise(r=>setTimeout(r,120));
+      const brNode = document.getElementById('trustBreakPanel');
+      if(brNode){
+        const canvas = await html2canvas(brNode, { scale:2, backgroundColor:null, useCORS:true });
+        const imgW = pageW - 80; const imgH = canvas.height * (imgW/canvas.width);
+        pdf.addImage(canvas.toDataURL('image/png'),'PNG',40,60,imgW,Math.min(imgH,pageH-100),'','FAST');
+      } else {
+        pdf.setFont('helvetica','normal'); pdf.setFontSize(12); pdf.text('Нет данных для брейкдауна.',40,70);
+      }
+      // Стр.2 — Итоги викторины
+      pdf.addPage();
+      pdf.setFont('helvetica','bold'); pdf.setFontSize(16); pdf.text('Мини‑викторина — результаты',40,40);
+      pdf.setFont('helvetica','normal'); pdf.setFontSize(11);
+      let y = 64; const maxW = pageW-80;
+      if(!quizLog.length){ pdf.text('Вопросов не было.',40,y); }
+      else {
+        quizLog.forEach(q=>{
+          const txt = `Ход ${q.step}. ${q.q}\nОтвет: ${q.answers[q.chosenIdx]||'—'}; Верный: ${q.answers[q.correctIdx]}\n${q.correct?'Верно':'Неверно'}.`;
+          const lines = pdf.splitTextToSize(txt, maxW);
+          pdf.text(lines,40,y); y += lines.length*12 + 8;
+          if(y>pageH-40){ pdf.addPage(); y=40; }
+        });
+      }
+      // Итоговая страница — служебная информация
+      pdf.addPage();
+      pdf.setFont('helvetica','bold'); pdf.setFontSize(14); pdf.text('Служебная информация',40,40);
+      pdf.setFont('helvetica','normal'); pdf.setFontSize(11);
+      const foot = [
+        `Страна: ${country}`,
+        `Режим: ${gameMode}`,
+        `Ходов: ${stepsTotal}`,
+        `Версия расширений: pack2+pack3`
+      ].join('\n');
+      pdf.text(pdf.splitTextToSize(foot, pageW-80), 40, 60);
+      // Сохраняем расширение
+      pdf.save('trade_wars_report_appendix.pdf');
+      toast('Доп. PDF сформирован');
+    }catch(err){ console.warn('[Pack3] PDF+ warn:', err); return __oldPDF(); }
+  };
+  // ---------------------------------------------------------------
+  // CSV: ДОБАВИМ ИТОГЫ ВИКТОРИНЫ ДЛЯ ОБУЧЕНИЯ (отдельный файл)
+  // ---------------------------------------------------------------
+  window.downloadQuizCSV = function(){
+    try{
+      const head = ['step','scenario_id','question','chosen','correct','correct_idx','chosen_idx'];
+      const rows = quizLog.map(q=>[
+        q.step,
+        csvEscape(q.id),
+        csvEscape(q.q),
+        csvEscape(q.answers[q.chosenIdx]||''),
+        q.correct?1:0,
+        q.correctIdx,
+        q.chosenIdx
+      ]);
+      const csv = [head.join(','), ...rows.map(r=>r.join(','))].join('\n');
+      const blob = new Blob([csv],{type:'text/csv;charset=utf-8;'});
+      if(window.saveAs){ saveAs(blob, 'trade_wars_quiz.csv'); } else { const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='trade_wars_quiz.csv'; a.click(); URL.revokeObjectURL(a.href); }
+      toast('CSV по викторине сформирован');
+    }catch(err){ console.warn('[Pack3] quiz CSV warn:', err); }
+  };
+  // Кнопка для скачивания CSV по квизам в блок «Экспорт отчёта»
+  (function injectQuizExport(){
+    try{
+      const container = document.querySelector('#screenResult .card.pad + .card.pad .grid.cols-2');
+      if(!container) return;
+      const right = container.children[1];
+      if(!right) return;
+      if(document.getElementById('btnQuizCsv')) return;
+      const pnl = right.querySelector('.panel');
+      const btn = document.createElement('button'); btn.id='btnQuizCsv'; btn.className='btn ghost'; btn.style.marginTop='8px';
+      btn.innerHTML = '<i class="fa-solid fa-file-csv"></i> Скачать CSV (викторина)';
+      btn.addEventListener('click', ()=>window.downloadQuizCSV());
+      if(pnl) pnl.appendChild(btn);
+    }catch(err){ console.warn('[Pack3] inject quiz export warn:', err); }
+  })();
+  // ---------------------------------------------------------------
+  // ВИЗУАЛЬНАЯ КОСМЕТИКА: акценты, выравнивания, адаптивность
+  // ---------------------------------------------------------------
+  (function injectCosmetics(){
+    if(document.getElementById('pack3-style')) return;
+    const st = document.createElement('style'); st.id='pack3-style';
+    st.textContent = `
+      /* Прячем селектор страны окончательно */
+      #selCountry{ display:none !important; }
+      label[for='selCountry']{ display:none !important; }
+      /* Подчистим карточки влияния */
+      .inf-card{ transition: border-color .2s ease, box-shadow .2s ease, transform .12s ease; }
+      .inf-card:hover{ transform: translateY(-1px); }
+      .inf-title{ letter-spacing:.2px; }
+      /* Кнопки ответов викторины компактнее на мобиле */
+      @media (max-width:640px){ #quizWrap .btn{ width:100%; } }
+      /* Плашки-подсказки */
+      #cmpBadge{ background:linear-gradient(135deg,#0ea5e9,#22c55e); color:#fff; border:none; }
+    `;
+    document.head.appendChild(st);
+  })();
+  // ---------------------------------------------------------------
+  // СЛУЖЕБНЫЕ ЗАМЕТКИ PACK3 (покажем в итоговом отчёте под анализом)
+  // ---------------------------------------------------------------
+  window.pack3Notes = [];
+  function pack3Note(msg){ try{ window.pack3Notes.push({ step: stepIndex+1, msg }); }catch{} }
+  const __oldShowResult2 = window.showResult;
+  window.showResult = function(){
+    __oldShowResult2();
+    try{
+      if(pack3Notes.length){
+        const resText = document.getElementById('resultText'); if(!resText) return;
+        const div = document.createElement('div'); div.className='small'; div.style.marginTop='8px';
+        const html = pack3Notes.map(n=>`<li>Ход ${n.step}: ${n.msg}</li>`).join('');
+        div.innerHTML = `<hr style=\"border-color:var(--line);margin:8px 0\"/><b>Заметки кампаний (pack3):</b><ul style=\"margin:6px 0 0 18px\">${html}</ul>`;
+        resText.appendChild(div);
+      }
+    }catch(err){ console.warn('[Pack3] showResult notes warn:', err); }
+  };
+  // ---------------------------------------------------------------
+  // ДРУЖЕСТВЕННЫЕ ПОДСКАЗКИ ПО УПРАВЛЕНИЮ (toast)
+  // ---------------------------------------------------------------
+  (function helpfulToasts(){
+    try{
+      const done = sessionStorage.getItem('pack3_toast');
+      if(!done){
+        setTimeout(()=>{ toast('Выбор страны — через карточки. Нажми на страну и «Начать игру».'); sessionStorage.setItem('pack3_toast','1'); }, 600);
+      }
+    }catch{}
+  })();
+})();
+
+// --- Ensure single-tap activation for Next button on touch devices ---
+(function ensureNextSingleTap(){
+  const btn = document.getElementById('btnNext');
+  if (!btn) return;
+  // prevent double-tap zoom issues on iOS
+  btn.addEventListener('touchend', function(e){ e.preventDefault(); btn.click(); }, {passive:false});
+})();
+
+
+/*
+  === Пасхалка r6tr0 / amir ===
+  Активация (в коде, чтобы игрок сам не догадался):
+  — Desktop: удерживай Shift и нажми "E", затем набери по буквам r6tr0 (нечувствительно к регистру).
+  — Mobile: сделай 3 быстрых тапа по левому логотипу, затем долгий тап 800мс.
+  Подсказки для теста разработчика оставлены в комментариях.
+*/
+(function eggInit(){
+  const mask = document.getElementById('eggMask');
+  const close = document.getElementById('eggClose');
+  const logo = document.querySelector('.brand'); // левый логотип/заголовок
+  function openEgg(){ mask.style.display='grid'; }
+  function closeEgg(){ mask.style.display='none'; }
+  close.addEventListener('click', closeEgg);
+
+  // Desktop combo: Shift+E then type r6tr0
+  let armed = false, buffer = '';
+  window.addEventListener('keydown', (e)=>{
+    if (e.key.toLowerCase()==='e' && e.shiftKey){ armed = true; buffer=''; }
+    else if (armed){
+      buffer += e.key.toLowerCase();
+      if (!'r6tr0'.startsWith(buffer)) { armed=false; buffer=''; }
+      else if (buffer==='r6tr0'){ openEgg(); armed=false; buffer=''; }
+    }
+  });
+
+  // Mobile: triple-tap then long-press
+  let taps = 0, lastTap = 0, pressTimer=null;
+  function onTap(){
+    const now = Date.now();
+    if (now - lastTap < 400) taps++; else taps=1;
+    lastTap = now;
+    if (taps>=3){
+      // ждём долгого удержания
+      if (pressTimer) clearTimeout(pressTimer);
+      logo.addEventListener('touchstart', ()=>{
+        pressTimer = setTimeout(openEgg, 800);
+      }, {once:true});
+      logo.addEventListener('touchend', ()=>{ if (pressTimer) clearTimeout(pressTimer); }, {once:true});
+    }
+  }
+  if (logo){
+    logo.addEventListener('click', onTap);
+    logo.addEventListener('touchend', (e)=>{ e.preventDefault(); onTap(); }, {passive:false});
+  }
+})();
+
+
+// Adjust chart heights for device
+(function adjustChartHeights(){
+  const isMobile = window.matchMedia('(max-width: 768px)').matches;
+  document.documentElement.setAttribute('data-device', isMobile ? 'mobile' : 'desktop');
+  const h = isMobile ? '240px' : '360px';
+  document.documentElement.style.setProperty('--chart-h', h);
+})();
+
+</script>
+<script>
+/* Device detection + layout mode */
+(function deviceMode() {
+  const root = document.documentElement;
+
+  // Признаки мобильных UA + безопасная «сетка» по ширине
+  const uaMobile = /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+  const mqMobile = window.matchMedia('(max-width: 768px)').matches;
+
+  function setMode() {
+    const mobile = uaMobile || window.matchMedia('(max-width: 768px)').matches;
+    root.setAttribute('data-device', mobile ? 'mobile' : 'desktop');
+    // Дополнительно уменьшаем высоту графиков на мобильных
+    try {
+      const chartWraps = document.querySelectorAll('#chart, #finalChart, #trustChart');
+      chartWraps.forEach(cv => {
+        const parent = cv.closest('.panel') || cv.parentElement;
+        if (!parent) return;
+        // Высота контейнера: мобильный/десктоп
+        parent.style.setProperty('--chart-h', mobile ? '260px' : '360px');
+      });
+      // Сообщить Chart.js, что контейнер изменился
+      if (window.Chart) {
+        Chart.helpers.each(Chart.instances, function(inst) {
+          if (inst) inst.resize();
+        });
+      }
+    } catch (e) {}
+  }
+
+  setMode();
+  // Переключаемся при изменении размера/ориентации
+  window.addEventListener('resize', setMode);
+  window.addEventListener('orientationchange', setMode);
+})();
+
+// --- Ensure single-tap activation for Next button on touch devices ---
+(function ensureNextSingleTap(){
+  const btn = document.getElementById('btnNext');
+  if (!btn) return;
+  // prevent double-tap zoom issues on iOS
+  btn.addEventListener('touchend', function(e){ e.preventDefault(); btn.click(); }, {passive:false});
+})();
+
+
+/*
+  === Пасхалка r6tr0 / amir ===
+  Активация (в коде, чтобы игрок сам не догадался):
+  — Desktop: удерживай Shift и нажми "E", затем набери по буквам r6tr0 (нечувствительно к регистру).
+  — Mobile: сделай 3 быстрых тапа по левому логотипу, затем долгий тап 800мс.
+  Подсказки для теста разработчика оставлены в комментариях.
+*/
+(function eggInit(){
+  const mask = document.getElementById('eggMask');
+  const close = document.getElementById('eggClose');
+  const logo = document.querySelector('.brand'); // левый логотип/заголовок
+  function openEgg(){ mask.style.display='grid'; }
+  function closeEgg(){ mask.style.display='none'; }
+  close.addEventListener('click', closeEgg);
+
+  // Desktop combo: Shift+E then type r6tr0
+  let armed = false, buffer = '';
+  window.addEventListener('keydown', (e)=>{
+    if (e.key.toLowerCase()==='e' && e.shiftKey){ armed = true; buffer=''; }
+    else if (armed){
+      buffer += e.key.toLowerCase();
+      if (!'r6tr0'.startsWith(buffer)) { armed=false; buffer=''; }
+      else if (buffer==='r6tr0'){ openEgg(); armed=false; buffer=''; }
+    }
+  });
+
+  // Mobile: triple-tap then long-press
+  let taps = 0, lastTap = 0, pressTimer=null;
+  function onTap(){
+    const now = Date.now();
+    if (now - lastTap < 400) taps++; else taps=1;
+    lastTap = now;
+    if (taps>=3){
+      // ждём долгого удержания
+      if (pressTimer) clearTimeout(pressTimer);
+      logo.addEventListener('touchstart', ()=>{
+        pressTimer = setTimeout(openEgg, 800);
+      }, {once:true});
+      logo.addEventListener('touchend', ()=>{ if (pressTimer) clearTimeout(pressTimer); }, {once:true});
+    }
+  }
+  if (logo){
+    logo.addEventListener('click', onTap);
+    logo.addEventListener('touchend', (e)=>{ e.preventDefault(); onTap(); }, {passive:false});
+  }
+})();
+
+
+// Adjust chart heights for device
+(function adjustChartHeights(){
+  const isMobile = window.matchMedia('(max-width: 768px)').matches;
+  document.documentElement.setAttribute('data-device', isMobile ? 'mobile' : 'desktop');
+  const h = isMobile ? '240px' : '360px';
+  document.documentElement.style.setProperty('--chart-h', h);
+})();
+
+</script>
+<!-- …твой контент, графики и т.п.… -->
+
+<!-- Скрипты страницы… -->
+<script>
+  // Убираем задержку кликов на iOS Safari
+  document.addEventListener('touchstart', function(){}, {passive: true});
+
+  // Функция, которая прячет правый логотип в шапке на мобильных
+  function applyHeaderTidy(){
+    const isMobile = document.documentElement.getAttribute('data-device') === 'mobile';
+    const rightLogo = document.querySelector('.logo-wrap svg.fa-mark:last-child');
+    if (rightLogo) rightLogo.style.display = isMobile ? 'none' : '';
+  }
+
+  // Запускаем сразу и при смене ориентации/изменении ширины
+  applyHeaderTidy();
+  window.addEventListener('resize', applyHeaderTidy);
+  window.addEventListener('orientationchange', applyHeaderTidy);
+
+document.addEventListener('DOMContentLoaded', function(){
+  try { el && el.btnStart && el.btnStart.addEventListener('click', startGame); } catch(e){}
+});
+
+// --- Ensure single-tap activation for Next button on touch devices ---
+(function ensureNextSingleTap(){
+  const btn = document.getElementById('btnNext');
+  if (!btn) return;
+  // prevent double-tap zoom issues on iOS
+  btn.addEventListener('touchend', function(e){ e.preventDefault(); btn.click(); }, {passive:false});
+})();
+
+
+/*
+  === Пасхалка r6tr0 / amir ===
+  Активация (в коде, чтобы игрок сам не догадался):
+  — Desktop: удерживай Shift и нажми "E", затем набери по буквам r6tr0 (нечувствительно к регистру).
+  — Mobile: сделай 3 быстрых тапа по левому логотипу, затем долгий тап 800мс.
+  Подсказки для теста разработчика оставлены в комментариях.
+*/
+(function eggInit(){
+  const mask = document.getElementById('eggMask');
+  const close = document.getElementById('eggClose');
+  const logo = document.querySelector('.brand'); // левый логотип/заголовок
+  function openEgg(){ mask.style.display='grid'; }
+  function closeEgg(){ mask.style.display='none'; }
+  close.addEventListener('click', closeEgg);
+
+  // Desktop combo: Shift+E then type r6tr0
+  let armed = false, buffer = '';
+  window.addEventListener('keydown', (e)=>{
+    if (e.key.toLowerCase()==='e' && e.shiftKey){ armed = true; buffer=''; }
+    else if (armed){
+      buffer += e.key.toLowerCase();
+      if (!'r6tr0'.startsWith(buffer)) { armed=false; buffer=''; }
+      else if (buffer==='r6tr0'){ openEgg(); armed=false; buffer=''; }
+    }
+  });
+
+  // Mobile: triple-tap then long-press
+  let taps = 0, lastTap = 0, pressTimer=null;
+  function onTap(){
+    const now = Date.now();
+    if (now - lastTap < 400) taps++; else taps=1;
+    lastTap = now;
+    if (taps>=3){
+      // ждём долгого удержания
+      if (pressTimer) clearTimeout(pressTimer);
+      logo.addEventListener('touchstart', ()=>{
+        pressTimer = setTimeout(openEgg, 800);
+      }, {once:true});
+      logo.addEventListener('touchend', ()=>{ if (pressTimer) clearTimeout(pressTimer); }, {once:true});
+    }
+  }
+  if (logo){
+    logo.addEventListener('click', onTap);
+    logo.addEventListener('touchend', (e)=>{ e.preventDefault(); onTap(); }, {passive:false});
+  }
+})();
+
+
+// Adjust chart heights for device
+(function adjustChartHeights(){
+  const isMobile = window.matchMedia('(max-width: 768px)').matches;
+  document.documentElement.setAttribute('data-device', isMobile ? 'mobile' : 'desktop');
+  const h = isMobile ? '240px' : '360px';
+  document.documentElement.style.setProperty('--chart-h', h);
+})();
+
+</script>
+<script>
+/* === v3.2: Compact Chart.js defaults on mobile === */
+(function tuneChartsForMobile() {
+  try {
+    if (!window.matchMedia || !window.matchMedia('(max-width: 768px)').matches) return;
+    if (!window.Chart) return;
+
+    // Глобальные дефолты компактнее
+    Chart.defaults.font.size = 11;
+    Chart.defaults.maintainAspectRatio = false;
+
+    if (Chart.defaults.plugins && Chart.defaults.plugins.legend) {
+      Chart.defaults.plugins.legend.display = false;
+    }
+    if (Chart.defaults.plugins && Chart.defaults.plugins.tooltip) {
+      Chart.defaults.plugins.tooltip.mode = 'nearest';
+      Chart.defaults.plugins.tooltip.intersect = false;
+      Chart.defaults.plugins.tooltip.bodySpacing = 3;
+    }
+
+    if (Chart.defaults.elements) {
+      if (Chart.defaults.elements.point) {
+        Chart.defaults.elements.point.radius = 0;
+        Chart.defaults.elements.point.hoverRadius = 3;
+        Chart.defaults.elements.point.hitRadius = 10;
+      }
+      if (Chart.defaults.elements.line) {
+        Chart.defaults.elements.line.borderWidth = 2;
+        Chart.defaults.elements.line.tension = 0.25; // чуть сгладим
+      }
+    }
+
+    // Оси: меньше тиков, сетку скрываем по умолчанию
+    Chart.defaults.scale = Chart.defaults.scale || {};
+    Chart.defaults.scale.ticks = Chart.defaults.scale.ticks || {};
+    Chart.defaults.scale.ticks.maxTicksLimit = 5;
+    Chart.defaults.scale.grid = Chart.defaults.scale.grid || {};
+    Chart.defaults.scale.grid.display = false;
+
+    // Высота графика на мобильных (через CSS-переменную)
+    document.documentElement.style.setProperty('--chart-h', '220px');
+
+    // Если у тебя есть конкретный id контейнера графика — задай высоту явно:
+    var canvases = document.querySelectorAll('canvas');
+    canvases.forEach(function(cv) {
+      // Если высота не задана стилем — задай от переменной
+      if (!cv.style.height) cv.style.height = 'var(--chart-h)';
+    });
+  } catch (e) {
+    console.warn('Mobile Chart tune failed:', e);
+  }
+})();
+</script>
+<style id="v32-mobile-fixes">
+/* ===== v3.2: Mobile centering & compact charts ===== */
+@media (max-width: 768px) {
+  header.appbar{ justify-content:center !important; text-align:center !important; }
+  header.appbar .brand{ margin:0 auto !important; }
+  header.appbar .logo-wrap{ display:none !important; }
+
+  #screenStart .card.hero .grid.cols-2{ justify-items:center !important; }
+  #screenStart .card.hero .grid.cols-2 > div:first-child,
+  #screenStart .card.hero .grid.cols-2 > div:last-child{ width:100% !important; }
+  #screenStart h1.title, #screenStart .subtitle, #screenStart .panel h3, #screenStart .panel .note{ text-align:center !important; }
+
+  #screenStart .hero-steps .panel{ display:flex; flex-direction:column; align-items:center; text-align:center; }
+
+  #screenStart .cta-row{ flex-direction:column !important; align-items:stretch !important; }
+  #btnStart, #btnReportFromStart{ width:100% !important; }
+  #btnStart{ padding:18px 20px !important; font-size:16px !important; }
+
+  #screenStart .panel .small, #screenStart .panel .note{ font-size:13px !important; line-height:1.45 !important; }
+}
+canvas{ width:100% !important; max-width:100% !important; display:block; }
+</style>
+<script id="v32-mobile-fixes">
+(function v32ChartTune(){
+  var isMobile = window.matchMedia('(max-width: 768px)').matches;
+  if (isMobile) {
+    document.documentElement.style.setProperty('--chart-h', '220px');
+    if (window.Chart && Chart.defaults){
+      Chart.defaults.maintainAspectRatio = false;
+      Chart.defaults.animation = false;
+      if (Chart.defaults.elements?.point){ Chart.defaults.elements.point.radius = 2; Chart.defaults.elements.point.hoverRadius = 3; }
+      if (Chart.defaults.elements?.line){ Chart.defaults.elements.line.borderWidth = 2; Chart.defaults.elements.line.tension = 0.25; }
+      if (Chart.defaults.plugins?.legend?.labels){ Chart.defaults.plugins.legend.labels.usePointStyle = true; Chart.defaults.plugins.legend.labels.boxWidth = 10; }
+      Chart.defaults.layout = Chart.defaults.layout || {};
+      Chart.defaults.layout.padding = {left:0, right:0, top:0, bottom:0};
+      if (Chart.defaults.scales){
+        Chart.defaults.scales.x = Chart.defaults.scales.x || {};
+        Chart.defaults.scales.y = Chart.defaults.scales.y || {};
+        Chart.defaults.scales.x.ticks = Object.assign({maxTicksLimit:5}, Chart.defaults.scales.x.ticks || {});
+        Chart.defaults.scales.y.ticks = Object.assign({maxTicksLimit:5}, Chart.defaults.scales.y.ticks || {});
+      }
+    }
+  }
+  try {
+    var next = document.getElementById('btnNext');
+    if (next){ next.addEventListener('touchend', function(e){ e.preventDefault(); next.click(); }, {passive:false}); }
+  } catch(e){}
+})();
+</script>
+
+</body>
+</html>
